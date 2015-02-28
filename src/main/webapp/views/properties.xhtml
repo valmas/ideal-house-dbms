@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition template="/templates/super.xhtml">
+
+	<ui:define name="menu">
+		<ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li><h:commandLink action="#{helloWorldBean.init}" value="Home"/></li>
+          <li><a href="examples.xhtml">Examples</a></li>
+          <li class="selected"><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
+          <li><a href="another_page.xhtml">Another Page</a></li>
+          <li><a href="contact.xhtml">Contact Us</a></li>
+        </ul>
+	</ui:define>
+	<ui:define name="content">
+		<a4j:outputPanel id="resultsGrid">
+		<rich:panel id="results_panel" header="Employees currently working" > 
+			<h:outputText rendered="#{empty employeeBean.results}" 
+				value="No employees are currently working"/>
+				
+			<rich:panel rendered="#{not empty employeeBean.results}" style="text-align: center;">
+				<rich:dataScroller for="all_employee_table" rendered="#{employeeBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="all_employee_table" value="#{employeeBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="AFM" >
+						<f:facet name="header">AFM</f:facet>
+						<h:outputText value="#{result.afm}" />
+					</rich:column>
+					
+					<rich:column id="employeeNo" >
+						<f:facet name="header">Employee No</f:facet>
+						<h:outputText value="#{result.employeeNo}" />
+					</rich:column>
+					
+					<rich:column id="firstName">
+						<f:facet name="header">First name</f:facet>
+						<h:outputText value="#{result.firstName}" />
+					</rich:column>
+					
+					<rich:column id="lastName">
+						<f:facet name="header">Last name</f:facet>
+						<h:outputText value="#{result.lastName}" />
+					</rich:column>
+					
+					<rich:column id="streetName" >
+						<f:facet name="header">Street name</f:facet>
+						<h:outputText value="#{result.streetName}" />
+					</rich:column>
+					
+					<rich:column id="streetNo" >
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
+					</rich:column>
+					
+					<rich:column id="postalCode" >
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
+					</rich:column>
+					
+					<rich:column id="salary" >
+						<f:facet name="header">Salary</f:facet>
+						<h:outputText value="#{result.salary}" />
+					</rich:column>
+					
+					<rich:column id="workPhoneNumber" >
+						<f:facet name="header">Work phone</f:facet>
+						<h:outputText value="#{result.workPhoneNumber}" />
+					</rich:column>
+					
+					<rich:column id="mobilePhoneNumber" >
+						<f:facet name="header">Mobile phone</f:facet>
+						<h:outputText value="#{result.mobilePhoneNumber}" />
+					</rich:column>
+					
+					<rich:column id="supervisorAFM" >
+						<f:facet name="header">Supervisor's AFM</f:facet>
+						<h:outputText value="#{result.supervisorAFM}" />
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="emp_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="emp_order"
+	                        value="#{employeeBean.orderBy}">
+				        <f:selectItem id="item1" itemLabel="AFM" itemValue="AFM" />
+				        <f:selectItem id="item2" itemLabel="Employee No" itemValue="EmployeeNo" />
+				        <f:selectItem id="item3" itemLabel="First name" itemValue="FirstName" />
+				        <f:selectItem id="item4" itemLabel="Last name" itemValue="LastName" />
+				        <f:selectItem id="item5" itemLabel="Street name" itemValue="Addr_StreetName" />
+				        <f:selectItem id="item6" itemLabel="Street No" itemValue="Addr_StreetNo" />
+				        <f:selectItem id="item7" itemLabel="Postal code" itemValue="Addr_PostalCode" />
+				        <f:selectItem id="item8" itemLabel="Salary" itemValue="Salary" />
+				        <f:selectItem id="item9" itemLabel="Work phone" itemValue="WorkPhoneNumber" />
+				        <f:selectItem id="item10" itemLabel="Mobile phone" itemValue="MobilePhoneNumber" />
+				        <f:selectItem id="item11" itemLabel="Supervisor's AFM" itemValue="SupervisorAFM" />
+				        <f:ajax event="change" listener="#{employeeBean.orderResults}" render="resultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		<h:panelGrid columns="2">
+		<a4j:outputPanel id="addEmpsGrid">
+		<c:set value="#{employeeBean.employee}" var="declaration"/>
+		<rich:panel id="add_employee" header="Add an employee"> 
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					<h:outputText value="AFM" />
+					<h:inputText value="#{declaration.afm}" />
+					
+					<h:outputText value="Employee No" />
+					<h:inputText value="#{declaration.employeeNo}" />
+					
+					<h:outputText value="First name" />
+					<h:inputText value="#{declaration.firstName}" />
+					
+					<h:outputText value="Last name" />
+					<h:inputText value="#{declaration.lastName}" /> 
+					
+					<h:outputText value="Street name" />
+					<h:inputText value="#{declaration.streetName}" />
+					
+					<h:outputText value="Street No" />
+					<h:inputText value="#{declaration.streetNo}" />
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="Postal code" />
+					<h:inputText value="#{declaration.postalCode}" />
+					
+					<h:outputText value="Salary" />
+					<h:inputText value="#{declaration.salary}" />
+					
+					<h:outputText value="Work phone number" />
+					<h:inputText value="#{declaration.workPhoneNumber}" />
+					
+					<h:outputText value="Mobile phone number" />
+					<h:inputText value="#{declaration.mobilePhoneNumber}" />
+					
+					<h:outputText value="Supervisor AFM" />
+					<h:inputText value="#{declaration.supervisorAFM}" />
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add Employee" action="#{employeeBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{employeeBean.clearAdd}" render="addEmpsGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		<a4j:outputPanel id="updateEmpsGrid">
+		<rich:panel id="update_employee" header="Update an employee"> 
+		<c:set value="#{employeeBean.updateEmployee}" var="update"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update employee with afm" style="font-weight: bold;"/>
+				<h:inputText value="#{employeeBean.updateAfm}" />
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					<h:outputText value="AFM" />
+					<h:inputText value="#{update.afm}" />
+					
+					<h:outputText value="Employee No" />
+					<h:inputText value="#{update.employeeNo}" />
+					
+					<h:outputText value="First name" />
+					<h:inputText value="#{update.firstName}" />
+					
+					<h:outputText value="Last name" />
+					<h:inputText value="#{update.lastName}" /> 
+					
+					<h:outputText value="Street name" />
+					<h:inputText value="#{update.streetName}" />
+					
+					<h:outputText value="Street No" />
+					<h:inputText value="#{update.streetNo}" />
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="Postal code" />
+					<h:inputText value="#{update.postalCode}" />
+					
+					<h:outputText value="Salary" />
+					<h:inputText value="#{update.salary}" />
+					
+					<h:outputText value="Work phone number" />
+					<h:inputText value="#{update.workPhoneNumber}" />
+					
+					<h:outputText value="Mobile phone number" />
+					<h:inputText value="#{update.mobilePhoneNumber}" />
+					
+					<h:outputText value="Supervisor AFM" />
+					<h:inputText value="#{update.supervisorAFM}" />
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update employee" action="#{employeeBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{employeeBean.clearUpdate}" render="updateEmpsGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		</h:panelGrid>
+		<c:set value="#{employeeBean.searchEmployee}" var="search"/>
+		<rich:panel id="search_employee" header="Search for employees" style="text-align:center;"> 
+			<h:panelGrid columns="2" style="margin:auto;">
+				<h:panelGrid columns="2">
+					<d:strOpField id="afm" label="AFM" 
+						value="#{search.afm}" opValue="#{search.afmOp}"/>
+						
+					<d:strOpField id="empNo" label="Employee No" 
+						value="#{search.employeeNo}" opValue="#{search.employeeNoOp}"/>
+						
+					<d:strOpField id="firstName" label="First name" 
+						value="#{search.firstName}" opValue="#{search.firstNameOp}"/>
+						
+					<d:strOpField id="lastName" label="Last name" 
+						value="#{search.lastName}" opValue="#{search.lastNameOp}"/>
+					
+					<d:strOpField id="streetName" label="Street name" 
+						value="#{search.streetName}" opValue="#{search.streetNameOp}"/>
+					
+					<d:strOpField id="streetNo" label="Street No" 
+						value="#{search.streetNo}" opValue="#{search.streetNoOp}"/>
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<d:strOpField id="postalCode" label="Postal code" 
+						value="#{search.postalCode}" opValue="#{search.postalCodeOp}"/>
+					
+					<d:operatorField id="salary" label="Salary" 
+						value="#{search.salary}" opValue="#{search.salaryOp}"/>
+					
+					<d:strOpField id="workPhone" label="Work phone number" 
+						value="#{search.workPhoneNumber}" opValue="#{search.workPhoneNumberOp}"/>
+						
+					<d:strOpField id="mobilePhone" label="Mobile phone number" 
+						value="#{search.mobilePhoneNumber}" opValue="#{search.mobilePhoneNumberOp}"/>
+					
+					<d:strOpField id="supervisorAFM" label="Supervisor AFM" 
+						value="#{search.supervisorAFM}" opValue="#{search.supervisorAFMOp}"/>
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" style="margin:auto;" >
+				<a4j:commandButton value="Search" action="#{employeeBean.search}" render="@all"/>
+				<a4j:commandButton value="Clear criteria" action="#{employeeBean.clearSearch}" render="searchResultsGrid search_employee"/>
+			</h:panelGrid>		
+			
+		<a4j:outputPanel id="searchResultsGrid">
+		<rich:panel id="search_results_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty employeeBean.searchResults}" 
+				value="No employees found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty employeeBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="search_employee_table" rendered="#{employeeBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="search_employee_table" value="#{employeeBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="searchAFM" >
+						<f:facet name="header">AFM</f:facet>
+						<h:outputText value="#{result.afm}" />
+					</rich:column>
+					
+					<rich:column id="searchemployeeNo" >
+						<f:facet name="header">Employee No</f:facet>
+						<h:outputText value="#{result.employeeNo}" />
+					</rich:column>
+					
+					<rich:column id="searchfirstName">
+						<f:facet name="header">First name</f:facet>
+						<h:outputText value="#{result.firstName}" />
+					</rich:column>
+					
+					<rich:column id="searchlastName">
+						<f:facet name="header">Last name</f:facet>
+						<h:outputText value="#{result.lastName}" />
+					</rich:column>
+					
+					<rich:column id="searchstreetName" >
+						<f:facet name="header">Street name</f:facet>
+						<h:outputText value="#{result.streetName}" />
+					</rich:column>
+					
+					<rich:column id="searchstreetNo" >
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
+					</rich:column>
+					
+					<rich:column id="searchpostalCode" >
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
+					</rich:column>
+					
+					<rich:column id="searchsalary" >
+						<f:facet name="header">Salary</f:facet>
+						<h:outputText value="#{result.salary}" />
+					</rich:column>
+					
+					<rich:column id="searchworkPhoneNumber" >
+						<f:facet name="header">Work phone</f:facet>
+						<h:outputText value="#{result.workPhoneNumber}" />
+					</rich:column>
+					
+					<rich:column id="searchmobilePhoneNumber" >
+						<f:facet name="header">Mobile phone</f:facet>
+						<h:outputText value="#{result.mobilePhoneNumber}" />
+					</rich:column>
+					
+					<rich:column id="searchsupervisorAFM" >
+						<f:facet name="header">Supervisor's AFM</f:facet>
+						<h:outputText value="#{result.supervisorAFM}" />
+					</rich:column>
+					
+					<rich:column id="actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{employeeBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{employeeBean.prepareUpdate(result)}" render="updateEmpsGrid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton value="Delete All" action="#{employeeBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		</rich:panel>
+		
+		
+	</ui:define>
+</ui:composition>
+</html>

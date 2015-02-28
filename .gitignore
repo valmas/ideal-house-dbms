@@ -45,6 +45,7 @@ pom.xml.versionsBackup
 .settings
 .project
 .classpath
+.metadata
 .springWebflow
 
 # Other #

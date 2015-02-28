@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<ui:composition template="/templates/super.xhtml">
+
+	<ui:define name="menu">
+		<ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><h:commandLink action="#{helloWorldBean.init}" value="Home"/></li>
+          <li><a href="examples.xhtml">Examples</a></li>
+          <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
+          <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
+          <li><a href="contact.xhtml">Contact Us</a></li>
+        </ul>
+	</ui:define>
+	<ui:define name="content">
+		<rich:panel id="form_panel" header="Form"> 
+			<h:panelGrid columns="2">
+				<h:outputText value="name" />
+				<h:inputText value="#{dbForm.name}" label="sfsdf" />
+				
+				<h:outputText value="age" />
+				<h:inputText value="#{dbForm.age}" label="sfsdf" />
+				
+				<h:outputText value="date Of birth" />
+				<rich:calendar value="#{dbForm.dateOfBirth}" /> 
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2">
+				<h:commandButton value="Go to View" action="#{employeeBean.init}" />
+				<a4j:commandButton value="submit" action="#{helloWorldBean.doQuery}" render="resultsGrid"  />
+			</h:panelGrid>		
+		</rich:panel>
+		
+		<a4j:outputPanel id="resultsGrid">
+		<rich:panel id="results_panel" header="Results"> 
+		
+			<h:panelGroup rendered="#{helloWorldBean.results != null }">
+		
+				<rich:dataTable id="declaration_requests_table" value="#{helloWorldBean.results}" 
+					var="result" rows="20" style="white-space:nowrap; width:100%;">
+					<rich:column id="PID" >
+						<f:facet name="header">PID</f:facet>
+						<h:outputText value="#{result.pid}" />
+					</rich:column>
+					
+					<rich:column id="lastName" >
+						<f:facet name="header">Last Name</f:facet>
+						<h:outputText value="#{result.lastName}" />
+					</rich:column>
+					
+					<rich:column id="firstName">
+						<f:facet name="header">First Name</f:facet>
+						<h:outputText value="#{result.firstName}" />
+					</rich:column>
+					
+					<rich:column id="address" >
+						<f:facet name="header">Address</f:facet>
+						<h:outputText value="#{result.address}" />
+					</rich:column>
+					
+					<rich:column id="city" >
+						<f:facet name="header">City</f:facet>
+						<h:outputText value="#{result.city}" />
+					</rich:column>
+					
+				</rich:dataTable>
+			</h:panelGroup>
+		</rich:panel>
+		</a4j:outputPanel>
+	</ui:define>
+</ui:composition>
+</html>
