@@ -1,5 +1,9 @@
 package com.ntua.db.jpa;
 
+import org.springframework.util.StringUtils;
+
+import com.ntua.db.common.Utils;
+
 /**
  * The Class PropertyType.
  */
@@ -12,7 +16,7 @@ public class PropertyType {
 	private String propertyTypeIdOp;
 	
 	/** The rooms. */
-	private int rooms;
+	private Integer rooms;
 	
 	/** The rooms op. */
 	private String roomsOp;
@@ -73,7 +77,7 @@ public class PropertyType {
 	 *
 	 * @return the rooms
 	 */
-	public int getRooms() {
+	public Integer getRooms() {
 		return rooms;
 	}
 
@@ -82,7 +86,7 @@ public class PropertyType {
 	 *
 	 * @param rooms the new rooms
 	 */
-	public void setRooms(int rooms) {
+	public void setRooms(Integer rooms) {
 		this.rooms = rooms;
 	}
 
@@ -138,6 +142,48 @@ public class PropertyType {
 	 */
 	public void setDescriptionOp(String descriptionOp) {
 		this.descriptionOp = descriptionOp;
+	}
+	
+	public String insertQuery(){
+		String query = "INSERT INTO PropertyTypes VALUES(";
+		query = query + (StringUtils.hasText(propertyTypeId) ? "'" + propertyTypeId + "'," : "null,");
+		query = query + rooms + ",";
+		query = query + (StringUtils.hasText(description) ? "'" + description + "'," : "null,");
+		return query;
+	}
+	
+	/**
+	 * Update query.
+	 *
+	 * @param updateRegNo the update reg no
+	 * @return the string
+	 */
+	public String updateQuery(String updateRegNo){
+		String query = "UPDATE PropertyTypes SET ";
+		query = query + (StringUtils.hasText(propertyTypeId) ? "PropertyTypeID='" + propertyTypeId + "'," : "PropertyTypeID=null,");
+		query = query + "Rooms=" + rooms + ",";
+		query = query + (StringUtils.hasText(description) ? "Description='" + description + "'" : "Description=null,");
+		if(query.endsWith(","))
+			query = query.substring(0, query.length()-1);
+		query += " WHERE PropertyRegistrationNo='"+updateRegNo+"'";
+		return query;
+	}
+	
+	/**
+	 * Search query.
+	 *
+	 * @return the string
+	 */
+	public String searchQuery(){
+		String query = "SELECT * FROM PropertyTypes p WHERE";
+		query = query + Utils.constructSearchQuery(propertyTypeIdOp, propertyTypeId, " p.PropertyTypeID");
+		query = query + (rooms != null ? " p.Rooms"+ roomsOp+"" + rooms + " and" : "");
+		query = query + Utils.constructSearchQuery(descriptionOp, description, " p.Description");
+		if(query.endsWith("WHERE"))
+			query = query.substring(0, query.length()-8);
+		else
+			query = query.substring(0, query.length()-3);
+		return query;
 	}
 	
 	
