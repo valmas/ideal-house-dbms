@@ -12,4 +12,9 @@
 		<tag-name>strOpField</tag-name>
 		<source>../components/strOpField.xhtml</source>
 	</tag>
+	
+	<tag>
+		<tag-name>selectOne</tag-name>
+		<source>../components/selectOne.xhtml</source>
+	</tag>
 </facelet-taglib>

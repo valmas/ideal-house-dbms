@@ -43,6 +43,9 @@ public class PropertyBean {
 	@Inject
 	private JdbcBaseDao jdbc;
 	
+	@Inject
+	private PropertyTypeBean propTypeBean;
+	
 	/** The connection. */
 	private Connection connection;
 	
@@ -65,6 +68,7 @@ public class PropertyBean {
 		clearSearch();
 		selectAll();
 		jdbc.closeConnection(connection);
+		propTypeBean.init();
 		return "/views/properties.xhtml?faces-redirect=true";
 	}
 	
@@ -84,7 +88,8 @@ public class PropertyBean {
 					new FacesMessage("Selected entry has been inserted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
-					new FacesMessage("Error while inserting data into table Properties: " +e.getMessage()));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error while inserting data into table Properties: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -109,7 +114,8 @@ public class PropertyBean {
 					new FacesMessage("Selected entry has been deleted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
-					new FacesMessage("Error while inserting data into table Properties: " +e.getMessage()));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error while deleting data into table Properties: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -134,7 +140,8 @@ public class PropertyBean {
 					new FacesMessage("All selected entries have been deleted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
-					new FacesMessage("Error while deleting data from table Properties: " +e.getMessage()));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error while deleting data from table Properties: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -175,7 +182,8 @@ public class PropertyBean {
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
-					new FacesMessage("Error while retrieving data from table Properties: " +e.getMessage()));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error while retrieving data from table Properties: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -229,11 +237,13 @@ public class PropertyBean {
 				FacesContext.getCurrentInstance().addMessage(null, 
 						new FacesMessage(FacesMessage.SEVERITY_ERROR,
 								"No entries have been updated. Please check if the Property Registration No: "+updateRegNo+" exists", null));
+			} else {
+				selectAll();
+				clearSearch();
+				FacesContext.getCurrentInstance().addMessage(null, 
+						new FacesMessage("The selected entry has been updated successfully"));
 			}
-			selectAll();
-			clearSearch();
-			FacesContext.getCurrentInstance().addMessage(null, 
-					new FacesMessage("The selected entry has been updated successfully"));
+			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -265,7 +275,8 @@ public class PropertyBean {
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
-					new FacesMessage("Error while retrieving data from table Properties: " +e.getMessage()));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error while retrieving data from table Properties: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);

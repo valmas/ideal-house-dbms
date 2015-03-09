@@ -14,30 +14,34 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.ntua.db.common.Queries;
 import com.ntua.db.jdbc.JdbcBaseDao;
-import com.ntua.db.jpa.PropertyType;
+import com.ntua.db.jpa.OwnersPhone;
 
 /**
- * The Class PropertyBean.
+ * The Class OwnerPhoneBean.
  */
 @ApplicationScoped
-@Named("propTypeBean")
-public class PropertyTypeBean {
-
-	/** The prop type. */
-	private PropertyType propType;
+@Named("ownerPhoneBean")
+public class OwnerPhoneBean {
 	
-	/** The search prop type. */
-	private PropertyType searchPropType;
+	/** The owner. */
+	private OwnersPhone owner;
 	
-	/** The update prop type. */
-	private PropertyType updatePropType;
+	/** The search owner. */
+	private OwnersPhone searchOwner;
+	
+	/** The update owner. */
+	private OwnersPhone updateOwner;
 	
 	/** The order by. */
 	private String orderBy;
 	
-	/** The update type id. */
-	private String updateTypeId;
+	/** The update afm. */
+	private String updateAfm;
+	
+	/** The update afm. */
+	private String updatePhone;
 	
 	/** The jdbc. */
 	@Inject
@@ -47,10 +51,10 @@ public class PropertyTypeBean {
 	private Connection connection;
 	
 	/** The results. */
-	private List<PropertyType> results;
+	private List<OwnersPhone> results;
 	
 	/** The search results. */
-	private List<PropertyType> searchResults;
+	private List<OwnersPhone> searchResults;
 	
 	/**
 	 * Inits the.
@@ -58,10 +62,11 @@ public class PropertyTypeBean {
 	 * @return the string
 	 */
 	public void init(){
-		propType = new PropertyType();
-		updatePropType = new PropertyType();
-		updateTypeId = null;
-		orderBy = "PropertyTypeID";
+		owner = new OwnersPhone();
+		updateOwner = new OwnersPhone();
+		updateAfm = null;
+		updatePhone = null;
+		orderBy = "AFM";
 		clearSearch();
 		selectAll();
 		jdbc.closeConnection(connection);
@@ -76,7 +81,7 @@ public class PropertyTypeBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = propType.insertQuery();
+			String queryString = owner.insertQuery();
 			statement.executeUpdate(queryString);		
 			selectAll();
 			FacesContext.getCurrentInstance().addMessage(null, 
@@ -84,7 +89,7 @@ public class PropertyTypeBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while inserting data into table PropertyTypes: " +e.getMessage(), null));
+							"Error while inserting data into table OwnerPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -94,23 +99,24 @@ public class PropertyTypeBean {
 	/**
 	 * Delete.
 	 *
-	 * @param propType the prop type
+	 * @param ownPhone the own phone
 	 */
-	public void delete(PropertyType propType){
+	public void delete(OwnersPhone ownPhone){
 		connection = jdbc.getJdbcConnection();
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = "DELETE FROM PropertyTypes WHERE PropertyTypeID = " + propType.getPropertyTypeId() ;
-			statement.executeUpdate(queryString);		
+			String queryString = "DELETE FROM OwnerPhones WHERE afm = '" + ownPhone.getAfm() 
+					+"' and phoneNumber='" + ownPhone.getPhoneNumber()+ "'";
+			statement.executeUpdate(queryString);
 			selectAll();
-			removeFromList(propType);
+			removeFromList(ownPhone);
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage("Selected entry has been deleted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data into table PropertyTypes: " +e.getMessage(), null));
+							"Error while deleting data into table OwnerPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -125,9 +131,10 @@ public class PropertyTypeBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			for (PropertyType prop : searchResults) {
-				String queryString = "DELETE FROM PropertyTypes WHERE PropertyTypeID = " + prop.getPropertyTypeId();
-				statement.executeUpdate(queryString);		
+			for (OwnersPhone own : searchResults) {
+				String queryString = "DELETE FROM OwnerPhones WHERE afm = '" + own.getAfm() 
+						+"' and phoneNumber='" + own.getPhoneNumber()+ "'";
+				statement.executeUpdate(queryString);
 			}
 			selectAll();
 			clearSearch();
@@ -136,7 +143,7 @@ public class PropertyTypeBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data from table PropertyTypes: " +e.getMessage(), null));
+							"Error while deleting data from table OwnerPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -146,11 +153,11 @@ public class PropertyTypeBean {
 	/**
 	 * Removes the from list.
 	 *
-	 * @param propType the prop type
+	 * @param ownPhone the own phone
 	 */
-	private void removeFromList(PropertyType propType){
+	private void removeFromList(OwnersPhone ownPhone){
 		for (int i=0; i<searchResults.size(); i++) {
-			if(searchResults.get(i).getPropertyTypeId().equals(propType.getPropertyTypeId())){
+			if(searchResults.get(i).getAfm().equals(ownPhone.getAfm())){
 				searchResults.remove(i);
 				return;
 			}
@@ -168,17 +175,17 @@ public class PropertyTypeBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = searchPropType.searchQuery();
+			String queryString = searchOwner.searchQuery();
 			resultSet = statement.executeQuery(queryString);
-			searchResults = new ArrayList<PropertyType>();
+			searchResults = new ArrayList<OwnersPhone>();
 			while (resultSet.next()) {
-				searchResults.add(populatePropTypes(resultSet));
+				searchResults.add(populateOwnerPhone(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table PropertyTypes: " +e.getMessage(), null));
+							"Error while retrieving data from table OwnerPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -190,7 +197,7 @@ public class PropertyTypeBean {
 	 * Clear search.
 	 */
 	public void clearSearch(){
-		searchPropType = new PropertyType();
+		searchOwner = new OwnersPhone();
 		searchResults = null;
 	}
 	
@@ -198,25 +205,26 @@ public class PropertyTypeBean {
 	 * Clear update.
 	 */
 	public void clearUpdate(){
-		updatePropType = new PropertyType();
-		updateTypeId = null;
+		updateOwner = new OwnersPhone();
+		updateAfm = null;
 	}
 	
 	/**
 	 * Clear add.
 	 */
 	public void clearAdd(){
-		propType = new PropertyType();
+		owner = new OwnersPhone();
 	}
 	
 	/**
 	 * Prepare update.
 	 *
-	 * @param propType the prop type
+	 * @param ownPhone the own phone
 	 */
-	public void prepareUpdate(PropertyType propType){
-		updateTypeId = propType.getPropertyTypeId();
-		updatePropType = new PropertyType(propType);
+	public void prepareUpdate(OwnersPhone ownPhone){
+		updateAfm = ownPhone.getAfm();
+		updatePhone = ownPhone.getPhoneNumber();
+		updateOwner = new OwnersPhone(ownPhone);
 	}
 	
 	/**
@@ -227,11 +235,12 @@ public class PropertyTypeBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = updatePropType.updateQuery(updateTypeId);
+			String queryString = updateOwner.updateQuery(updateAfm, updatePhone);
 			if(statement.executeUpdate(queryString) == 0){
 				FacesContext.getCurrentInstance().addMessage(null, 
 						new FacesMessage(FacesMessage.SEVERITY_ERROR,
-								"No entries have been updated. Please check if the Property Type Id: "+updateTypeId+" exists", null));
+								"No entries have been updated. Please check if the afm: "+updateAfm+
+								" and phoneNumber: "+updatePhone+" exists", null));
 			} else {
 				selectAll();
 				clearSearch();
@@ -241,7 +250,7 @@ public class PropertyTypeBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while updating data to table PropertyTypes: "+ e.getMessage(), null));
+							"Error while updating data to table OwnerPhones: "+ e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -258,19 +267,19 @@ public class PropertyTypeBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = "Select * from PropertyTypes";
+			String queryString = Queries.SELECT_ALL_OWNERS_PHONE;
 			if(orderBy != null)
 				queryString += " order by "+orderBy;
 			resultSet = statement.executeQuery(queryString);
-			results = new ArrayList<PropertyType>();
+			results = new ArrayList<OwnersPhone>();
 			while (resultSet.next()) {
-				results.add(populatePropTypes(resultSet));
+				results.add(populateOwnerPhone(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table PropertyTypes: " +e.getMessage(), null));
+							"Error while retrieving data from table OwnerPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -278,19 +287,17 @@ public class PropertyTypeBean {
 	}
 	
 	/**
-	 * Populate prop types.
+	 * Populate owner phone.
 	 *
 	 * @param resultSet the result set
-	 * @return the property type
+	 * @return the owners phone
 	 * @throws SQLException the SQL exception
 	 */
-	private PropertyType populatePropTypes(ResultSet resultSet) throws SQLException{
-		PropertyType propTypes = new PropertyType();
-		propTypes.setPropertyTypeId(resultSet.getString("PropertyTypeID"));
-		String rooms = resultSet.getString("Rooms");
-		propTypes.setRooms(rooms == null ? null : Integer.parseInt(rooms));
-		propTypes.setDescription(resultSet.getString("Description"));
-		return propTypes;
+	private OwnersPhone populateOwnerPhone(ResultSet resultSet) throws SQLException{
+		OwnersPhone ownPhone = new OwnersPhone();
+		ownPhone.setAfm(resultSet.getString("AFM"));
+		ownPhone.setPhoneNumber(resultSet.getString("PhoneNumber"));
+		return ownPhone;
 	}
 	
 	/**
@@ -303,13 +310,71 @@ public class PropertyTypeBean {
         jdbc.closeConnection(connection);
     }
 
+	/**
+	 * Gets the owner.
+	 *
+	 * @return the owner
+	 */
+	public OwnersPhone getOwner() {
+		return owner;
+	}
+
+
+	/**
+	 * Sets the owner.
+	 *
+	 * @param owner the new owner
+	 */
+	public void setOwner(OwnersPhone owner) {
+		this.owner = owner;
+	}
+
+
+	/**
+	 * Gets the search owner.
+	 *
+	 * @return the search owner
+	 */
+	public OwnersPhone getSearchOwner() {
+		return searchOwner;
+	}
+
+
+	/**
+	 * Sets the search owner.
+	 *
+	 * @param searchOwner the new search owner
+	 */
+	public void setSearchOwner(OwnersPhone searchOwner) {
+		this.searchOwner = searchOwner;
+	}
+
+
+	/**
+	 * Gets the update owner.
+	 *
+	 * @return the update owner
+	 */
+	public OwnersPhone getUpdateOwner() {
+		return updateOwner;
+	}
+
+
+	/**
+	 * Sets the update owner.
+	 *
+	 * @param updateOwner the new update owner
+	 */
+	public void setUpdateOwner(OwnersPhone updateOwner) {
+		this.updateOwner = updateOwner;
+	}
 
 	/**
 	 * Gets the results.
 	 *
 	 * @return the results
 	 */
-	public List<PropertyType> getResults() {
+	public List<OwnersPhone> getResults() {
 		return results;
 	}
 
@@ -319,8 +384,28 @@ public class PropertyTypeBean {
 	 *
 	 * @param results the new results
 	 */
-	public void setResults(List<PropertyType> results) {
+	public void setResults(List<OwnersPhone> results) {
 		this.results = results;
+	}
+
+
+	/**
+	 * Gets the search results.
+	 *
+	 * @return the search results
+	 */
+	public List<OwnersPhone> getSearchResults() {
+		return searchResults;
+	}
+
+
+	/**
+	 * Sets the search results.
+	 *
+	 * @param searchResults the new search results
+	 */
+	public void setSearchResults(List<OwnersPhone> searchResults) {
+		this.searchResults = searchResults;
 	}
 
 
@@ -345,102 +430,40 @@ public class PropertyTypeBean {
 
 
 	/**
-	 * Gets the search results.
+	 * Gets the update afm.
 	 *
-	 * @return the search results
+	 * @return the update afm
 	 */
-	public List<PropertyType> getSearchResults() {
-		return searchResults;
+	public String getUpdateAfm() {
+		return updateAfm;
 	}
 
 
 	/**
-	 * Sets the search results.
+	 * Sets the update afm.
 	 *
-	 * @param searchResults the new search results
+	 * @param updateAfm the new update afm
 	 */
-	public void setSearchResults(List<PropertyType> searchResults) {
-		this.searchResults = searchResults;
+	public void setUpdateAfm(String updateAfm) {
+		this.updateAfm = updateAfm;
 	}
 
-
 	/**
-	 * Gets the prop type.
+	 * Gets the update phone.
 	 *
-	 * @return the prop type
+	 * @return the update phone
 	 */
-	public PropertyType getPropType() {
-		return propType;
+	public String getUpdatePhone() {
+		return updatePhone;
 	}
 
-
 	/**
-	 * Sets the prop type.
+	 * Sets the update phone.
 	 *
-	 * @param propType the new prop type
+	 * @param updatePhone the new update phone
 	 */
-	public void setPropType(PropertyType propType) {
-		this.propType = propType;
-	}
-
-
-	/**
-	 * Gets the search prop type.
-	 *
-	 * @return the search prop type
-	 */
-	public PropertyType getSearchPropType() {
-		return searchPropType;
-	}
-
-
-	/**
-	 * Sets the search prop type.
-	 *
-	 * @param searchPropType the new search prop type
-	 */
-	public void setSearchPropType(PropertyType searchPropType) {
-		this.searchPropType = searchPropType;
-	}
-
-
-	/**
-	 * Gets the update prop type.
-	 *
-	 * @return the update prop type
-	 */
-	public PropertyType getUpdatePropType() {
-		return updatePropType;
-	}
-
-
-	/**
-	 * Sets the update prop type.
-	 *
-	 * @param updatePropType the new update prop type
-	 */
-	public void setUpdatePropType(PropertyType updatePropType) {
-		this.updatePropType = updatePropType;
-	}
-
-
-	/**
-	 * Gets the update type id.
-	 *
-	 * @return the update type id
-	 */
-	public String getUpdateTypeId() {
-		return updateTypeId;
-	}
-
-
-	/**
-	 * Sets the update type id.
-	 *
-	 * @param updateTypeId the new update type id
-	 */
-	public void setUpdateTypeId(String updateTypeId) {
-		this.updateTypeId = updateTypeId;
+	public void setUpdatePhone(String updatePhone) {
+		this.updatePhone = updatePhone;
 	}
 
 }

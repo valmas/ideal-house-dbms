@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition template="/templates/super.xhtml">
+
+	<ui:define name="menu">
+		<ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li><h:commandLink action="#{helloWorldBean.init}" value="Home"/></li>
+          <li><a href="examples.xhtml">Examples</a></li>
+          <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
+          <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
+          <li class="selected"><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
+        </ul>
+	</ui:define>
+	<ui:define name="content">
+	
+	<rich:collapsiblePanel header="Business Owners" switchType="client" expanded="false">
+	
+		<ui:include src="/views/businessOwners.xhtml">
+			<ui:param name="id" value="bOwner"/>
+		</ui:include>
+		
+	</rich:collapsiblePanel>
+	
+	<rich:collapsiblePanel header="Private owners" switchType="client" expanded="false">
+		
+		<ui:include src="/views/privateOwners.xhtml">
+			<ui:param name="id" value="pOwner"/>
+		</ui:include>
+		
+	</rich:collapsiblePanel>
+	
+	<rich:collapsiblePanel header="Owners' phones" switchType="client" expanded="false">
+		
+		<ui:include src="/views/ownersPhone.xhtml">
+			<ui:param name="id" value="ownerPhone"/>
+		</ui:include>
+		
+	</rich:collapsiblePanel>
+	
+	</ui:define>
+</ui:composition>
+</html>

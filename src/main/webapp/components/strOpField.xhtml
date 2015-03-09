@@ -15,8 +15,17 @@
 			<f:selectItems value="#{codelistController.strOperators}" />
 			<f:ajax event="change" render="#{id}_operand"/>
 		</h:selectOneMenu>
-		<h:inputText value="#{value}" size="12" style="margin-left:0;" id="#{id}_operand"
-			disabled="#{opValue == 'null' or opValue == 'not null'}"/>
+		<c:choose>
+			<c:when test="#{textArea == null or not textArea}">
+				<h:inputText value="#{value}" size="12" style="margin-left:0;" id="#{id}_operand"
+					disabled="#{opValue == 'null' or opValue == 'not null'}"/>
+			</c:when>
+			<c:otherwise>
+				<h:inputTextarea value="#{value}" style="margin-left:0;" id="#{id}_operand"
+					disabled="#{opValue == 'null' or opValue == 'not null'}"/>
+			</c:otherwise>
+		</c:choose>	
+		
 	</h:panelGroup>
 
 </ui:composition>

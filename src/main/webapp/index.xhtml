@@ -12,10 +12,11 @@
 		<ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
           <li class="selected"><h:commandLink action="#{helloWorldBean.init}" value="Home"/></li>
-          <li><a href="examples.xhtml">Examples</a></li>
           <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
           <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
-          <li><a href="contact.xhtml">Contact Us</a></li>
+          <li><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
+          <li><a href="examples.xhtml">Clients</a></li>
+          <li><a href="examples.xhtml">Advertisement</a></li>
         </ul>
 	</ui:define>
 	<ui:define name="content">

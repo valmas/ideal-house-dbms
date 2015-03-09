@@ -14,24 +14,25 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.ntua.db.common.Queries;
 import com.ntua.db.jdbc.JdbcBaseDao;
-import com.ntua.db.jpa.Employee;
+import com.ntua.db.jpa.BusinessOwners;
 
 /**
- * The Class EmployeeBean.
+ * The Class BusinessOwnersBean.
  */
 @ApplicationScoped
-@Named("employeeBean")
-public class EmployeeBean {
-
-	/** The employee. */
-	private Employee employee;
+@Named("bOwnersBean")
+public class BusinessOwnersBean {
 	
-	/** The search employee. */
-	private Employee searchEmployee;
+	/** The owner. */
+	private BusinessOwners owner;
 	
-	/** The update employee. */
-	private Employee updateEmployee;
+	/** The search owner. */
+	private BusinessOwners searchOwner;
+	
+	/** The update owner. */
+	private BusinessOwners updateOwner;
 	
 	/** The order by. */
 	private String orderBy;
@@ -43,14 +44,22 @@ public class EmployeeBean {
 	@Inject
 	private JdbcBaseDao jdbc;
 	
+	/** The p owners bean. */
+	@Inject
+	private PrivateOwnersBean pOwnersBean;
+	
+	/** The p owners bean. */
+	@Inject
+	private OwnerPhoneBean ownerPhoneBean;
+	
 	/** The connection. */
 	private Connection connection;
 	
 	/** The results. */
-	private List<Employee> results;
+	private List<BusinessOwners> results;
 	
 	/** The search results. */
-	private List<Employee> searchResults;
+	private List<BusinessOwners> searchResults;
 	
 	/**
 	 * Inits the.
@@ -58,14 +67,16 @@ public class EmployeeBean {
 	 * @return the string
 	 */
 	public String init(){
-		employee = new Employee();
-		updateEmployee = new Employee();
+		owner = new BusinessOwners();
+		updateOwner = new BusinessOwners();
 		updateAfm = null;
 		orderBy = "AFM";
 		clearSearch();
 		selectAll();
 		jdbc.closeConnection(connection);
-		return "/views/employees.xhtml?faces-redirect=true";
+		pOwnersBean.init();
+		ownerPhoneBean.init();
+		return "/views/owners.xhtml?faces-redirect=true";
 	}
 	
 	
@@ -77,7 +88,9 @@ public class EmployeeBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = employee.insertQuery();
+			String queryString = owner.parentInsertQuery();
+			statement.executeUpdate(queryString);
+			queryString = owner.insertQuery();
 			statement.executeUpdate(queryString);		
 			selectAll();
 			FacesContext.getCurrentInstance().addMessage(null, 
@@ -85,7 +98,7 @@ public class EmployeeBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while inserting data into table Employees: " +e.getMessage(), null));
+							"Error while inserting data into table Owners: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -95,23 +108,25 @@ public class EmployeeBean {
 	/**
 	 * Delete.
 	 *
-	 * @param employee the employee
+	 * @param bOwner the b owner
 	 */
-	public void delete(Employee employee){
+	public void delete(BusinessOwners bOwner){
 		connection = jdbc.getJdbcConnection();
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = "DELETE FROM Employees WHERE afm = '" + employee.getAfm() +"'";
+			String queryString = "DELETE FROM BusinessOwners WHERE afm = '" + bOwner.getAfm() +"'";
+			statement.executeUpdate(queryString);
+			queryString = "DELETE FROM Owners WHERE afm = '" + bOwner.getAfm() +"'";
 			statement.executeUpdate(queryString);		
 			selectAll();
-			removeFromList(employee);
+			removeFromList(bOwner);
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage("Selected entry has been deleted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data into table Employees: " +e.getMessage(), null));
+							"Error while deleting data into table Owners: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -126,8 +141,10 @@ public class EmployeeBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			for (Employee emp : searchResults) {
-				String queryString = "DELETE FROM Employees WHERE afm = '" + emp.getAfm() +"'";
+			for (BusinessOwners own : searchResults) {
+				String queryString = "DELETE FROM BusinessOwners WHERE afm = '" + own.getAfm() +"'";
+				statement.executeUpdate(queryString);
+				queryString = "DELETE FROM Owners WHERE afm = '" + own.getAfm() +"'";
 				statement.executeUpdate(queryString);		
 			}
 			selectAll();
@@ -137,7 +154,7 @@ public class EmployeeBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data from table Employees: " +e.getMessage(), null));
+							"Error while deleting data from table Owners: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -147,11 +164,11 @@ public class EmployeeBean {
 	/**
 	 * Removes the from list.
 	 *
-	 * @param employee the employee
+	 * @param bOwner the b owner
 	 */
-	private void removeFromList(Employee employee){
+	private void removeFromList(BusinessOwners bOwner){
 		for (int i=0; i<searchResults.size(); i++) {
-			if(searchResults.get(i).getAfm().equals(employee.getAfm())){
+			if(searchResults.get(i).getAfm().equals(bOwner.getAfm())){
 				searchResults.remove(i);
 				return;
 			}
@@ -169,17 +186,17 @@ public class EmployeeBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = searchEmployee.searchQuery();
+			String queryString = searchOwner.searchQuery();
 			resultSet = statement.executeQuery(queryString);
-			searchResults = new ArrayList<Employee>();
+			searchResults = new ArrayList<BusinessOwners>();
 			while (resultSet.next()) {
-				searchResults.add(populateEmployee(resultSet));
+				searchResults.add(populateOwner(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table Employees: " +e.getMessage(), null));
+							"Error while retrieving data from table Owners: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -191,7 +208,7 @@ public class EmployeeBean {
 	 * Clear search.
 	 */
 	public void clearSearch(){
-		searchEmployee = new Employee();
+		searchOwner = new BusinessOwners();
 		searchResults = null;
 	}
 	
@@ -199,7 +216,7 @@ public class EmployeeBean {
 	 * Clear update.
 	 */
 	public void clearUpdate(){
-		updateEmployee = new Employee();
+		updateOwner = new BusinessOwners();
 		updateAfm = null;
 	}
 	
@@ -207,17 +224,17 @@ public class EmployeeBean {
 	 * Clear add.
 	 */
 	public void clearAdd(){
-		employee = new Employee();
+		owner = new BusinessOwners();
 	}
 	
 	/**
 	 * Prepare update.
 	 *
-	 * @param employee the employee
+	 * @param bOwner the b owner
 	 */
-	public void prepareUpdate(Employee employee){
-		updateAfm = employee.getAfm();
-		updateEmployee = new Employee(employee);
+	public void prepareUpdate(BusinessOwners bOwner){
+		updateAfm = bOwner.getAfm();
+		updateOwner = new BusinessOwners(bOwner);
 	}
 	
 	/**
@@ -228,21 +245,26 @@ public class EmployeeBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = updateEmployee.updateQuery(updateAfm);
+			String queryString = updateOwner.parentUpdateQuery(updateAfm);
 			if(statement.executeUpdate(queryString) == 0){
 				FacesContext.getCurrentInstance().addMessage(null, 
 						new FacesMessage(FacesMessage.SEVERITY_ERROR,
 								"No entries have been updated. Please check if the afm: "+updateAfm+" exists", null));
-			} else {
-				selectAll();
-				clearSearch();
-				FacesContext.getCurrentInstance().addMessage(null, 
-						new FacesMessage("The selected entry has been updated successfully"));
 			}
+			queryString = updateOwner.updateQuery(updateAfm);
+			if(statement.executeUpdate(queryString) == 0){
+				FacesContext.getCurrentInstance().addMessage(null, 
+						new FacesMessage(FacesMessage.SEVERITY_ERROR,
+								"No entries have been updated. Please check if the afm: "+updateAfm+" exists", null));
+			}
+			selectAll();
+			clearSearch();
+			FacesContext.getCurrentInstance().addMessage(null, 
+					new FacesMessage("The selected entry has been updated successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while updating data to table Employees: "+ e.getMessage(), null));
+							"Error while updating data to table Owners: "+ e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -259,19 +281,19 @@ public class EmployeeBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = "Select * from Employees";
+			String queryString = Queries.SELECT_ALL_BUSINESS_OWNERS;
 			if(orderBy != null)
 				queryString += " order by "+orderBy;
 			resultSet = statement.executeQuery(queryString);
-			results = new ArrayList<Employee>();
+			results = new ArrayList<BusinessOwners>();
 			while (resultSet.next()) {
-				results.add(populateEmployee(resultSet));
+				results.add(populateOwner(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table Employees: " +e.getMessage(), null));
+							"Error while retrieving data from table Owners: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -279,26 +301,23 @@ public class EmployeeBean {
 	}
 	
 	/**
-	 * Populate employee.
+	 * Populate owner.
 	 *
 	 * @param resultSet the result set
-	 * @return the employee
+	 * @return the business owners
 	 * @throws SQLException the SQL exception
 	 */
-	private Employee populateEmployee(ResultSet resultSet) throws SQLException{
-		Employee employee = new Employee();
-		employee.setAfm(resultSet.getString("AFM"));
-		employee.setEmployeeNo(resultSet.getString("EmployeeNo"));
-		employee.setLastName(resultSet.getString("LastName"));
-		employee.setFirstName(resultSet.getString("FirstName"));
-		employee.setStreetName(resultSet.getString("Addr_StreetName"));
-		employee.setStreetNo(resultSet.getString("Addr_StreetNo"));
-		employee.setPostalCode(resultSet.getString("Addr_PostalCode"));
-		employee.setSalary(resultSet.getBigDecimal("Salary"));
-		employee.setMobilePhoneNumber(resultSet.getString("MobilePhoneNumber"));
-		employee.setWorkPhoneNumber(resultSet.getString("WorkPhoneNumber"));
-		employee.setSupervisorAFM(resultSet.getString("SupervisorAFM"));
-		return employee;
+	private BusinessOwners populateOwner(ResultSet resultSet) throws SQLException{
+		BusinessOwners bOwner = new BusinessOwners();
+		bOwner.setAfm(resultSet.getString("AFM"));
+		bOwner.setStreetName(resultSet.getString("Addr_StreetName"));
+		bOwner.setStreetNo(resultSet.getString("Addr_StreetNo"));
+		bOwner.setPostalCode(resultSet.getString("Addr_PostalCode"));
+		bOwner.setBusinessName(resultSet.getString("BusinessName"));
+		bOwner.setBusinessType(resultSet.getString("BusinessType"));
+		bOwner.setContactFirstName(resultSet.getString("ContactFirstName"));
+		bOwner.setContactLastName(resultSet.getString("ContactLastName"));
+		return bOwner;
 	}
 	
 	/**
@@ -312,30 +331,70 @@ public class EmployeeBean {
     }
 
 	/**
-	 * Gets the employee.
+	 * Gets the owner.
 	 *
-	 * @return the employee
+	 * @return the owner
 	 */
-	public Employee getEmployee() {
-		return employee;
+	public BusinessOwners getOwner() {
+		return owner;
 	}
+
 
 	/**
-	 * Sets the employee.
+	 * Sets the owner.
 	 *
-	 * @param employee the new employee
+	 * @param owner the new owner
 	 */
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setOwner(BusinessOwners owner) {
+		this.owner = owner;
 	}
 
+
+	/**
+	 * Gets the search owner.
+	 *
+	 * @return the search owner
+	 */
+	public BusinessOwners getSearchOwner() {
+		return searchOwner;
+	}
+
+
+	/**
+	 * Sets the search owner.
+	 *
+	 * @param searchOwner the new search owner
+	 */
+	public void setSearchOwner(BusinessOwners searchOwner) {
+		this.searchOwner = searchOwner;
+	}
+
+
+	/**
+	 * Gets the update owner.
+	 *
+	 * @return the update owner
+	 */
+	public BusinessOwners getUpdateOwner() {
+		return updateOwner;
+	}
+
+
+	/**
+	 * Sets the update owner.
+	 *
+	 * @param updateOwner the new update owner
+	 */
+	public void setUpdateOwner(BusinessOwners updateOwner) {
+		this.updateOwner = updateOwner;
+	}
 
 	/**
 	 * Gets the results.
 	 *
 	 * @return the results
 	 */
-	public List<Employee> getResults() {
+	public List<BusinessOwners> getResults() {
 		return results;
 	}
 
@@ -345,8 +404,28 @@ public class EmployeeBean {
 	 *
 	 * @param results the new results
 	 */
-	public void setResults(List<Employee> results) {
+	public void setResults(List<BusinessOwners> results) {
 		this.results = results;
+	}
+
+
+	/**
+	 * Gets the search results.
+	 *
+	 * @return the search results
+	 */
+	public List<BusinessOwners> getSearchResults() {
+		return searchResults;
+	}
+
+
+	/**
+	 * Sets the search results.
+	 *
+	 * @param searchResults the new search results
+	 */
+	public void setSearchResults(List<BusinessOwners> searchResults) {
+		this.searchResults = searchResults;
 	}
 
 
@@ -367,65 +446,6 @@ public class EmployeeBean {
 	 */
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;
-	}
-
-
-	/**
-	 * Gets the search employee.
-	 *
-	 * @return the search employee
-	 */
-	public Employee getSearchEmployee() {
-		return searchEmployee;
-	}
-
-
-	/**
-	 * Sets the search employee.
-	 *
-	 * @param searchEmployee the new search employee
-	 */
-	public void setSearchEmployee(Employee searchEmployee) {
-		this.searchEmployee = searchEmployee;
-	}
-
-
-	/**
-	 * Gets the search results.
-	 *
-	 * @return the search results
-	 */
-	public List<Employee> getSearchResults() {
-		return searchResults;
-	}
-
-
-	/**
-	 * Sets the search results.
-	 *
-	 * @param searchResults the new search results
-	 */
-	public void setSearchResults(List<Employee> searchResults) {
-		this.searchResults = searchResults;
-	}
-
-	/**
-	 * Gets the update employee.
-	 *
-	 * @return the update employee
-	 */
-	public Employee getUpdateEmployee() {
-		return updateEmployee;
-	}
-
-
-	/**
-	 * Sets the update employee.
-	 *
-	 * @param updateEmployee the new update employee
-	 */
-	public void setUpdateEmployee(Employee updateEmployee) {
-		this.updateEmployee = updateEmployee;
 	}
 
 

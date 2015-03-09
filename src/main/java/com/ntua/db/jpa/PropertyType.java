@@ -148,7 +148,7 @@ public class PropertyType {
 		String query = "INSERT INTO PropertyTypes VALUES(";
 		query = query + (StringUtils.hasText(propertyTypeId) ? "'" + propertyTypeId + "'," : "null,");
 		query = query + rooms + ",";
-		query = query + (StringUtils.hasText(description) ? "'" + description + "'," : "null,");
+		query = query + (StringUtils.hasText(description) ? "'" + description + "'" : "null") + ")";
 		return query;
 	}
 	
@@ -165,7 +165,7 @@ public class PropertyType {
 		query = query + (StringUtils.hasText(description) ? "Description='" + description + "'" : "Description=null,");
 		if(query.endsWith(","))
 			query = query.substring(0, query.length()-1);
-		query += " WHERE PropertyRegistrationNo='"+updateRegNo+"'";
+		query += " WHERE PropertyTypeID='"+updateRegNo+"'";
 		return query;
 	}
 	

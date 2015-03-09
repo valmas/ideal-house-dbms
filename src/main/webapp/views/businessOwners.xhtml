@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition>
+	
+	<a4j:outputPanel id="#{id}_resultsGrid">
+		<rich:panel id="#{id}_results_panel" header="Business owners currently registered" > 
+			<h:outputText rendered="#{empty bOwnersBean.results}" 
+				value="No business owners are currently registered"/>
+				
+			<rich:panel rendered="#{not empty bOwnersBean.results}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_all_owner_table" rendered="#{bOwnersBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_all_owner_table" value="#{bOwnersBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_AFM" >
+						<f:facet name="header">AFM</f:facet>
+						<h:outputText value="#{result.afm}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_streetName" >
+						<f:facet name="header">Street name</f:facet>
+						<h:outputText value="#{result.streetName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_streetNo" >
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_postalCode" >
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_businessName" >
+						<f:facet name="header">Business name</f:facet>
+						<h:outputText value="#{result.businessName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_businessType">
+						<f:facet name="header">Business type</f:facet>
+						<h:outputText value="#{result.businessType}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_contactFirstName">
+						<f:facet name="header">Contact first name</f:facet>
+						<h:outputText value="#{result.contactFirstName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_contactLastName" >
+						<f:facet name="header">Contact last name</f:facet>
+						<h:outputText value="#{result.contactLastName}" />
+					</rich:column>
+					
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="#{id}_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="#{id}_order"
+	                        value="#{bOwnersBean.orderBy}">
+				        <f:selectItem id="#{id}item1" itemLabel="AFM" itemValue="AFM" />
+				        <f:selectItem id="#{id}item2" itemLabel="Street Name" itemValue="Addr_StreetName" />
+				        <f:selectItem id="#{id}item3" itemLabel="Street No" itemValue="Addr_StreetNo" />
+				        <f:selectItem id="#{id}item4" itemLabel="Postal code" itemValue="Addr_PostalCode" />
+				        <f:selectItem id="#{id}item5" itemLabel="Business name" itemValue="BusinessName" />
+				        <f:selectItem id="#{id}item6" itemLabel="Business type" itemValue="BusinessType" />
+				        <f:selectItem id="#{id}item7" itemLabel="Contact first name" itemValue="ContactFirstName" />
+				        <f:selectItem id="#{id}item8" itemLabel="Contact last name" itemValue="ContactLastName" />
+				        <f:ajax event="change" listener="#{bOwnersBean.orderResults}" render="#{id}_resultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		<h:panelGrid columns="2">
+		<a4j:outputPanel id="#{id}_addGrid">
+		<c:set value="#{bOwnersBean.owner}" var="declaration"/>
+		<rich:panel id="#{id}_add" header="Add a business owner"> 
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="AFM" />
+					<h:inputText value="#{declaration.afm}" />
+					
+					<h:outputText value="Street name" />
+					<h:inputText value="#{declaration.streetName}" />
+					
+					<h:outputText value="Street No" />
+					<h:inputText value="#{declaration.streetNo}" />
+					
+					<h:outputText value="Postal code" />
+					<h:inputText value="#{declaration.postalCode}" />				
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="Business name" />
+					<h:inputText value="#{declaration.businessName}" />
+					
+					<h:outputText value="Business type" />
+					<h:inputText value="#{declaration.businessType}" />
+					
+					<h:outputText value="Contact first name" />
+					<h:inputText value="#{declaration.contactFirstName}" />
+					
+					<h:outputText value="Contact last name" />
+					<h:inputText value="#{declaration.contactLastName}" />
+					
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add Owner" action="#{bOwnersBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{bOwnersBean.clearAdd}" render="#{id}_addGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+
+		<a4j:outputPanel id="#{id}_updateGrid">
+		<rich:panel id="#{id}_update" header="Update a business owner"> 
+		<c:set value="#{bOwnersBean.updateOwner}" var="update"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update business owner with afm" style="font-weight: bold;"/>
+				<h:inputText value="#{bOwnersBean.updateAfm}" />
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="AFM" />
+					<h:inputText value="#{update.afm}" />
+					
+					<h:outputText value="Street name" />
+					<h:inputText value="#{update.streetName}" />
+					
+					<h:outputText value="Street No" />
+					<h:inputText value="#{update.streetNo}" />
+					
+					<h:outputText value="Postal code" />
+					<h:inputText value="#{update.postalCode}" />				
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="Business name" />
+					<h:inputText value="#{update.businessName}" />
+					
+					<h:outputText value="Business type" />
+					<h:inputText value="#{update.businessType}" />
+					
+					<h:outputText value="Contact first name" />
+					<h:inputText value="#{update.contactFirstName}" />
+					
+					<h:outputText value="Contact last name" />
+					<h:inputText value="#{update.contactLastName}" />
+					
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update owner" action="#{bOwnersBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{bOwnersBean.clearUpdate}" render="#{id}_updateGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		</h:panelGrid>
+		<c:set value="#{bOwnersBean.searchOwner}" var="search"/>
+		<rich:panel id="#{id}_search" header="Search for business owners" style="text-align:center;"> 
+			<h:panelGrid columns="2" style="margin:auto;">
+				<h:panelGrid columns="2">
+				
+					<d:strOpField id="#{id}_afm" label="AFM" 
+						value="#{search.afm}" opValue="#{search.afmOp}"/>
+						
+					<d:strOpField id="#{id}_streetName" label="Street name" 
+						value="#{search.streetName}" opValue="#{search.streetNameOp}"/>
+					
+					<d:strOpField id="#{id}_streetNo" label="Street No" 
+						value="#{search.streetNo}" opValue="#{search.streetNoOp}"/>
+					
+					<d:strOpField id="#{id}_postalCode" label="Postal code" 
+						value="#{search.postalCode}" opValue="#{search.postalCodeOp}"/>
+						
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<d:strOpField id="businessName" label="Business name" 
+						value="#{search.businessName}" opValue="#{search.businessNameOp}"/>
+					
+					<d:strOpField id="businessType" label="Business type" 
+						value="#{search.businessType}" opValue="#{search.businessTypeOp}"/>
+					
+					<d:strOpField id="conFirstName" label="Contact first name" 
+						value="#{search.contactFirstName}" opValue="#{search.contactFirstNameOp}"/>
+						
+					<d:strOpField id="conLastName" label="Contact last name" 
+						value="#{search.contactLastName}" opValue="#{search.contactLastNameOp}"/>
+					
+
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" style="margin:auto;" >
+				<a4j:commandButton value="Search" action="#{bOwnersBean.search}" render="@all"/>
+				<a4j:commandButton value="Clear criteria" action="#{bOwnersBean.clearSearch}" 
+					render="#{id}_searchResultsGrid #{id}_search"/>
+			</h:panelGrid>		
+			
+		<a4j:outputPanel id="#{id}_searchResultsGrid">
+		<rich:panel id="#{id}_search_results_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty bOwnersBean.searchResults}" 
+				value="No owners found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty bOwnersBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_search_table" rendered="#{bOwnersBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_search_table" value="#{bOwnersBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_AFM" >
+						<f:facet name="header">AFM</f:facet>
+						<h:outputText value="#{result.afm}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_streetName" >
+						<f:facet name="header">Street name</f:facet>
+						<h:outputText value="#{result.streetName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_streetNo" >
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_postalCode" >
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_businessName" >
+						<f:facet name="header">Business name</f:facet>
+						<h:outputText value="#{result.businessName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_businessType">
+						<f:facet name="header">Business type</f:facet>
+						<h:outputText value="#{result.businessType}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_contactFirstName">
+						<f:facet name="header">Contact first name</f:facet>
+						<h:outputText value="#{result.contactFirstName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_contactLastName" >
+						<f:facet name="header">Contact last name</f:facet>
+						<h:outputText value="#{result.contactLastName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{bOwnersBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{bOwnersBean.prepareUpdate(result)}" render="#{id}_updateGrid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton rendered="#{bOwnersBean.searchResults.size() &gt; 1}" value="Delete All" 
+						action="#{bOwnersBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		</rich:panel>
+
+</ui:composition>
+</html>

@@ -49,8 +49,8 @@ create table Owners (
 );
 
 create table OwnerPhones (
-	PhoneNumber CHAR(10) NOT NULL,
 	AFM CHAR(9) NOT NULL,
+	PhoneNumber CHAR(10) NOT NULL,
 	PRIMARY KEY (PhoneNumber,AFM),
 	FOREIGN KEY (AFM) REFERENCES Owners(AFM)
 );

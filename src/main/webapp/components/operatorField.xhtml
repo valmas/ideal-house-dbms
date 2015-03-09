@@ -9,8 +9,8 @@
 
 	<h:outputText id="#{id}_label" value="#{label}" />
 	<h:panelGroup>
-		<h:selectOneMenu id="#{id}_operator"
-			style="padding: 2px; margin-left:10px;"
+		<h:selectOneMenu id="#{id}_operator" 
+			style="padding: 2px; margin-left:10px; width:67px;"
 			value="#{opValue}">
 			<f:selectItems value="#{codelistController.operators}" />
 		</h:selectOneMenu>

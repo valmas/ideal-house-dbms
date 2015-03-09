@@ -17,10 +17,13 @@
           <li><a href="examples.xhtml">Examples</a></li>
           <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
           <li class="selected"><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
-          <li><a href="contact.xhtml">Contact Us</a></li>
+          <li><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
         </ul>
 	</ui:define>
 	<ui:define name="content">
+	
+	<rich:collapsiblePanel header="Properties" switchType="client" expanded="false">
+	
 		<a4j:outputPanel id="resultsGrid">
 		<rich:panel id="results_panel" header="Properties currently registered" > 
 			<h:outputText rendered="#{empty propertyBean.results}" 
@@ -133,13 +136,16 @@
 					<h:inputText value="#{declaration.rent}" />
 					
 					<h:outputText value="Type Id" />
-					<h:inputText value="#{declaration.propertyTypeId}" />
+					<d:selectOne value="#{declaration.propertyTypeId}" 
+						methodName="#{codelistController.propTypeIDs}"/>
 					
 					<h:outputText value="Owner's AFM" />
-					<h:inputText value="#{declaration.ownerAFM}" />
+					<d:selectOne value="#{declaration.ownerAFM}" 
+						methodName="#{codelistController.ownersAfm}"/>
 					
 					<h:outputText value="Manager's AFM" />
-					<h:inputText value="#{declaration.managerAFM}" />
+					<d:selectOne value="#{declaration.managerAFM}" 
+						methodName="#{codelistController.employeesAfm}"/>
 					
 				</h:panelGrid>
 			
@@ -185,13 +191,16 @@
 					<h:inputText value="#{update.rent}" />
 					
 					<h:outputText value="Type Id" />
-					<h:inputText value="#{update.propertyTypeId}" />
+					<d:selectOne value="#{update.propertyTypeId}" 
+						methodName="#{codelistController.propTypeIDs}"/>
 					
 					<h:outputText value="Owner's AFM" />
-					<h:inputText value="#{update.ownerAFM}" />
+					<d:selectOne value="#{update.ownerAFM}" 
+						methodName="#{codelistController.ownersAfm}"/>
 					
 					<h:outputText value="Manager's AFM" />
-					<h:inputText value="#{update.managerAFM}" />
+					<d:selectOne value="#{update.managerAFM}" 
+						methodName="#{codelistController.employeesAfm}"/>
 				</h:panelGrid>
 			
 			</h:panelGrid>
@@ -328,6 +337,181 @@
 		</a4j:outputPanel>
 		</rich:panel>
 		
+	</rich:collapsiblePanel>
+	
+	<rich:collapsiblePanel header="Property types" switchType="client" expanded="false">
+		
+		<a4j:outputPanel id="propResultsGrid">
+		<rich:panel id="prop_results_panel" header="Property types currently registered" > 
+			<h:outputText rendered="#{empty propTypeBean.results}" 
+				value="No property types are currently registered"/>
+				
+			<rich:panel rendered="#{not empty propTypeBean.results}" style="text-align: center;">
+				<rich:dataScroller for="all_property_types_table" rendered="#{propTypeBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="all_property_types_table" value="#{propTypeBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="propertyTypeID" >
+						<f:facet name="header">Type ID</f:facet>
+						<h:outputText value="#{result.propertyTypeId}" />
+					</rich:column>
+					
+					<rich:column id="rooms" >
+						<f:facet name="header">Rooms</f:facet>
+						<h:outputText value="#{result.rooms}" />
+					</rich:column>
+					
+					<rich:column id="description">
+						<f:facet name="header">Description</f:facet>
+						<h:outputText value="#{result.description}" />
+					</rich:column>
+
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="prop_type_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="prop_type_order"
+	                        value="#{propTypeBean.orderBy}">
+				        <f:selectItem id="pitem1" itemLabel="Type ID" itemValue="PropertyTypeID" />
+				        <f:selectItem id="pitem2" itemLabel="Rooms" itemValue="Rooms" />
+				        <f:selectItem id="pitem3" itemLabel="Description" itemValue="Description" />
+				        <f:ajax event="change" listener="#{propTypeBean.orderResults}" render="propResultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		<h:panelGrid columns="2">
+		<a4j:outputPanel id="addPropsTypesGrid">
+		<c:set value="#{propTypeBean.propType}" var="declType"/>
+		<rich:panel id="add_property_type" header="Add a property type"> 
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					<h:outputText value="Type ID" />
+					<h:inputText value="#{declType.propertyTypeId}" />
+					
+					<h:outputText value="Rooms" />
+					<h:inputText value="#{declType.rooms}" />
+				
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+				
+					<h:outputText value="Description" />
+					<h:inputTextarea  value="#{declType.description}" />
+					
+				</h:panelGrid>
+			</h:panelGrid>
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add Property type" action="#{propTypeBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{propTypeBean.clearAdd}" render="addPropsGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+
+		<a4j:outputPanel id="updatePropsTypeGrid">
+		<rich:panel id="update_property_type" header="Update a property type"> 
+		<c:set value="#{propTypeBean.updatePropType}" var="updateType"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update property type with type ID" style="font-weight: bold;"/>
+				<h:inputText value="#{propTypeBean.updateTypeId}" />
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+			
+					<h:outputText value="Type ID" />
+					<h:inputText value="#{updateType.propertyTypeId}" />
+					
+					<h:outputText value="Rooms" />
+					<h:inputText value="#{updateType.rooms}" />
+				
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+				
+					<h:outputText value="Description" />
+					<h:inputTextarea  value="#{updateType.description}" />
+					
+				</h:panelGrid>
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update property" action="#{propTypeBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{propTypeBean.clearUpdate}" render="updatePropsTypeGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		</h:panelGrid>
+		<c:set value="#{propTypeBean.searchPropType}" var="searchType"/>
+		<rich:panel id="search_property_type" header="Search for property types" style="text-align:center;"> 
+			<h:panelGrid columns="2" style="margin:auto;">
+				<h:panelGrid columns="2">
+					
+					<d:strOpField id="propTypeId" label="Type ID" 
+						value="#{searchType.propertyTypeId}" opValue="#{searchType.propertyTypeIdOp}"/>
+				
+					<d:operatorField id="rooms" label="Rooms" 
+						value="#{searchType.rooms}" opValue="#{searchType.roomsOp}"/>
+					
+				</h:panelGrid>
+				<h:panelGrid columns="2">
+				
+					<d:strOpField id="description" label="Description" textArea="true"
+						value="#{searchType.description}" opValue="#{searchType.descriptionOp}"/>
+						
+				</h:panelGrid>		
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" style="margin:auto;" >
+				<a4j:commandButton value="Search" action="#{propTypeBean.search}" render="@all"/>
+				<a4j:commandButton value="Clear criteria" action="#{propTypeBean.clearSearch}" render="searchResultsTypesGrid search_property_type"/>
+			</h:panelGrid>		
+			
+		<a4j:outputPanel id="searchResultsTypesGrid">
+		<rich:panel id="search_results_types_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty propTypeBean.searchResults}" 
+				value="No property types found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty propTypeBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="search_property_type_table" rendered="#{propTypeBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="search_property_type_table" value="#{propTypeBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="searchPropertyTypeID" >
+						<f:facet name="header">Type ID</f:facet>
+						<h:outputText value="#{result.propertyTypeId}" />
+					</rich:column>
+					
+					<rich:column id="searchRooms" >
+						<f:facet name="header">Rooms</f:facet>
+						<h:outputText value="#{result.rooms}" />
+					</rich:column>
+					
+					<rich:column id="searchDescription">
+						<f:facet name="header">Description</f:facet>
+						<h:outputText value="#{result.description}" />
+					</rich:column>
+					
+					<rich:column id="actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{propTypeBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{propTypeBean.prepareUpdate(result)}" render="updatePropsTypeGrid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton rendered="#{propTypeBean.searchResults.size() &gt; 1}" value="Delete All" action="#{propTypeBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		</rich:panel>
+		
+	</rich:collapsiblePanel>
+	
 	</ui:define>
 </ui:composition>
 </html>

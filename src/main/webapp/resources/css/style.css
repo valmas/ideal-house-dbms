@@ -187,7 +187,7 @@ ul#menu li a:hover
 { width: 1000px;
   overflow: hidden;
   margin: 20px auto 0 auto;
-  padding: 0 0 10px 0;} 
+  padding: 0 0 50px 0;} 
 
 #content_header
 { margin: 5px auto 0 auto;
@@ -243,8 +243,10 @@ ul#menu li a:hover
 { width: 100%;
   font-family: 'trebuchet ms', sans-serif;
   font-size: 100%;
-  height: 80px;
-  padding: 28px 0 5px 0;
+  height: auto;
+  position: fixed;
+  bottom: 0px;
+  padding: 15px 0px 5px;
   text-align: center; 
   background: #3B3939 url(../resources/images/footer.png) repeat-x;
   color: #A8AA94;}
@@ -283,7 +285,7 @@ input, textarea
 { padding: 3px;
   margin-left: 10px;
   font: 100% arial; 
-  border: 1px solid #E5E5DB; 
+  border: 1px solid #C4C0B9; 
   background: #FFF; 
   color: #47433F;}
   
@@ -382,4 +384,15 @@ table tr td
 
 .rf-dt {
 	border: none !important;
+}
+
+.rf-cp {
+	background-color: inherit !important;
+	border: none !important;
+}
+
+.rf-cp-hdr {
+	background: none !important;
+	border: none !important;
+	font-size: 13px !important;
 }
