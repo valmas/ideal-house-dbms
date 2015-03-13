@@ -15,7 +15,7 @@ public class CodeListItem {
 		if(detailedLabel)
 			label = "(" + value + ") " + description;
 		else
-			label = value;
+			label = description;
 	}
 
 	public String getValue() {

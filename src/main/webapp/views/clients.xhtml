@@ -16,36 +16,44 @@
           <li><h:commandLink action="#{helloWorldBean.init}" value="Home"/></li>
           <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
           <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
-          <li class="selected"><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
-          <li><h:commandLink action="#{clientBean.init}" value="Clients"/></li>
+          <li><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
+          <li class="selected"><h:commandLink action="#{clientBean.init}" value="Clients"/></li>
         </ul>
 	</ui:define>
 	<ui:define name="content">
 	
-	<rich:collapsiblePanel header="Business Owners" switchType="client" expanded="false">
+	<rich:collapsiblePanel header="Clients" switchType="client" expanded="false">
 	
-		<ui:include src="/views/businessOwners.xhtml">
-			<ui:param name="id" value="bOwner"/>
+		<ui:include src="/views/clientsInfo.xhtml">
+			<ui:param name="id" value="client"/>
 		</ui:include>
 		
 	</rich:collapsiblePanel>
 	
-	<rich:collapsiblePanel header="Private owners" switchType="client" expanded="false">
+	<rich:collapsiblePanel header="Clients' phones" switchType="client" expanded="false">
 		
-		<ui:include src="/views/privateOwners.xhtml">
-			<ui:param name="id" value="pOwner"/>
+		<ui:include src="/views/clientsPhones.xhtml">
+			<ui:param name="id" value="clPhones"/>
 		</ui:include>
 		
 	</rich:collapsiblePanel>
 	
-	<rich:collapsiblePanel header="Owners' phones" switchType="client" expanded="false">
+	<rich:collapsiblePanel header="Clients' visits" switchType="client" expanded="false">
 		
-		<ui:include src="/views/ownersPhone.xhtml">
-			<ui:param name="id" value="ownerPhone"/>
+		<ui:include src="/views/visits.xhtml">
+			<ui:param name="id" value="visits"/>
 		</ui:include>
 		
 	</rich:collapsiblePanel>
 	
+	<rich:collapsiblePanel header="Clients' contracts" switchType="client" expanded="false">
+		
+		<ui:include src="/views/contracts.xhtml">
+			<ui:param name="id" value="contracts"/>
+		</ui:include>
+		
+	</rich:collapsiblePanel>
+	 
 	</ui:define>
 </ui:composition>
 </html>

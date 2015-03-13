@@ -13,7 +13,7 @@
 	<a4j:outputPanel id="#{id}_resultsGrid">
 		<rich:panel id="#{id}_results_panel" header="Owners' phone numbers currently registered" > 
 			<h:outputText rendered="#{empty ownerPhoneBean.results}" 
-				value="No private owners are currently registered"/>
+				value="No owners' phone numbers are currently registered"/>
 				
 			<rich:panel rendered="#{not empty ownerPhoneBean.results}" style="text-align: center;">
 				<rich:dataScroller for="#{id}_all_owner_table" rendered="#{ownerPhoneBean.results.size() &gt; 10}"/>

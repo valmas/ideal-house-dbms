@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition>
+	
+	<a4j:outputPanel id="#{id}_resultsGrid">
+		<rich:panel id="#{id}_results_panel" header="Clients currently registered" > 
+			<h:outputText rendered="#{empty clientBean.results}" 
+				value="No clients are currently registered"/>
+				
+			<rich:panel rendered="#{not empty clientBean.results}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_all_table" rendered="#{clientBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_all_table" value="#{clientBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_clientRegNo" >
+						<f:facet name="header">Registration No</f:facet>
+						<h:outputText value="#{result.clientRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_firstName" >
+						<f:facet name="header">First Name</f:facet>
+						<h:outputText value="#{result.firstName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_lastName">
+						<f:facet name="header">Last Name</f:facet>
+						<h:outputText value="#{result.lastName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_streetName" >
+						<f:facet name="header">Street Name</f:facet>
+						<h:outputText value="#{result.streetName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_streetNo">
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_postalCode">
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_regDate" >
+						<f:facet name="header">Registration Date</f:facet>
+						<h:outputText value="#{result.regDate}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_maxRent" >
+						<f:facet name="header">Max Rent</f:facet>
+						<h:outputText value="#{result.maxRent}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_active" >
+						<f:facet name="header">Active</f:facet>
+						<h:outputText value="#{result.active}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_registeredBy" >
+						<f:facet name="header">Registered By</f:facet>
+						<h:outputText value="#{result.registeredBy}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_preferedTypeId" >
+						<f:facet name="header">Preferred Type ID</f:facet>
+						<h:outputText value="#{result.preferedTypeId}" />
+					</rich:column>
+					
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="#{id}_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="#{id}_order"
+	                        value="#{clientBean.orderBy}">
+				        <f:selectItem id="item1" itemLabel="Registration No" itemValue="ClientRegistrationNo" />
+			            <f:selectItem id="item2" itemLabel="First Name" itemValue="FirstName" />
+				        <f:selectItem id="item3" itemLabel="Last Name" itemValue="LastName" />
+				        <f:selectItem id="item4" itemLabel="Street Name" itemValue="Addr_StreetName" />
+				        <f:selectItem id="item5" itemLabel="Street No" itemValue="Addr_StreetNo" />
+				        <f:selectItem id="item6" itemLabel="Postal code" itemValue="Addr_PostalCode" />
+				        <f:selectItem id="item7" itemLabel="Registration Date" itemValue="RegistrationDate" />
+				        <f:selectItem id="item8" itemLabel="Max Rent" itemValue="MaxRent" />
+				        <f:selectItem id="item9" itemLabel="Active" itemValue="Active" />
+				        <f:selectItem id="item10" itemLabel="Registered By" itemValue="RegisteredBy" />
+				        <f:selectItem id="item11" itemLabel="Preferred Type ID" itemValue="PreferedTypeId" />
+				        <f:ajax event="change" listener="#{clientBean.orderResults}" render="#{id}_resultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+	</a4j:outputPanel>
+	
+	<h:panelGrid columns="2">
+		<a4j:outputPanel id="#{id}_add_Grid">
+		<c:set value="#{clientBean.client}" var="declaration"/>
+		<rich:panel id="#{id}_add_panel" header="Add a client"> 
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					<h:outputText value="First name" />
+					<h:inputText value="#{declaration.firstName}" /> 
+					
+					<h:outputText value="Last name" />
+					<h:inputText value="#{declaration.lastName}" />
+					
+					<h:outputText value="Street name" />
+					<h:inputText value="#{declaration.streetName}" />
+					
+					<h:outputText value="Street No" />
+					<h:inputText value="#{declaration.streetNo}" />
+					
+					<h:outputText value="Postal code" />
+					<h:inputText value="#{declaration.postalCode}" />
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="Registration date" />
+					<rich:calendar value="#{declaration.regDate}" />
+					
+					<h:outputText value="Max rent" />
+					<h:inputText value="#{declaration.maxRent}" />
+					
+					<h:outputText value="Registered by" />
+					<d:selectOne value="#{declaration.registeredBy}" 
+						methodName="#{codelistController.employeesAfm}"/>
+					
+					<h:outputText value="Preferred type" />
+					<d:selectOne value="#{declaration.preferedTypeId}" 
+						methodName="#{codelistController.propTypeIDs}"/>
+					
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add Client" action="#{clientBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{clientBean.clearAdd}" render="#{id}_add_Grid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+
+		<a4j:outputPanel id="#{id}_update_Grid">
+		<rich:panel id="#{id}_update_panel" header="Update a client"> 
+		<c:set value="#{clientBean.updateClient}" var="update"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update client with registration No" style="font-weight: bold;"/>
+				<h:inputText value="#{clientBean.updateRegNo}" />
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+					<h:outputText value="First name" />
+					<h:inputText value="#{update.firstName}" /> 
+					
+					<h:outputText value="Last name" />
+					<h:inputText value="#{update.lastName}" />
+					
+					<h:outputText value="Street name" />
+					<h:inputText value="#{update.streetName}" />
+					
+					<h:outputText value="Street No" />
+					<h:inputText value="#{update.streetNo}" />
+					
+					<h:outputText value="Postal code" />
+					<h:inputText value="#{update.postalCode}" />
+					
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<h:outputText value="Registration date" />
+					<rich:calendar value="#{update.regDate}" />
+					
+					<h:outputText value="Max rent" />
+					<h:inputText value="#{update.maxRent}" />
+					
+					<h:outputText value="Active" />
+					<h:selectBooleanCheckbox value="#{update.active}" />
+					
+					<h:outputText value="Registered by" />
+					<d:selectOne value="#{update.registeredBy}" 
+						methodName="#{codelistController.employeesAfm}"/>
+					
+					<h:outputText value="Preferred type" />
+					<d:selectOne value="#{update.preferedTypeId}" 
+						methodName="#{codelistController.propTypeIDs}"/>
+					
+				</h:panelGrid>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update client" action="#{clientBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{clientBean.clearUpdate}" render="#{id}_update_Grid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+	</h:panelGrid>
+	
+	<c:set value="#{clientBean.searchClient}" var="search"/>
+	<rich:panel id="#{id}_search_panel" header="Search for clients" style="text-align:center;"> 
+		<h:panelGrid columns="2" style="margin:auto;">
+			<h:panelGrid columns="2">
+			
+				<d:operatorField id="regNo" label="Registration No" 
+					value="#{search.clientRegNo}" opValue="#{search.clientRegNoOp}"/>
+					
+				<d:strOpField id="firstName" label="First name" 
+					value="#{search.firstName}" opValue="#{search.firstNameOp}"/>
+				
+				<d:strOpField id="lastName" label="Last name" 
+					value="#{search.lastName}" opValue="#{search.lastNameOp}"/>
+				
+				<d:strOpField id="streetName" label="Street name" 
+						value="#{search.streetName}" opValue="#{search.streetNameOp}"/>
+					
+				<d:strOpField id="streetNo" label="Street No" 
+					value="#{search.streetNo}" opValue="#{search.streetNoOp}"/>
+				
+				<d:strOpField id="postalCode" label="Postal code" 
+					value="#{search.postalCode}" opValue="#{search.postalCodeOp}"/>
+					
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2">
+				
+				<d:dateOpField id="regDate" label="Registration date" 
+					value="#{search.regDate}" opValue="#{search.regDateOp}"/>
+				
+				<d:operatorField id="maxRent" label="Max rent" 
+					value="#{search.maxRent}" opValue="#{search.maxRentOp}"/>
+					
+				<h:outputText value="Active" />
+				<d:selectOne value="#{search.active}" 
+						methodName="#{codelistController.boolean}"/>
+				
+				<d:strOpField id="registeredBy" label="Registered by" 
+					value="#{search.registeredBy}" opValue="#{search.registeredByOp}"/>
+					
+				<d:strOpField id="preferedTypeId" label="Preferred type" 
+					value="#{search.preferedTypeId}" opValue="#{search.preferedTypeIdOp}"/>
+				
+			</h:panelGrid>
+		
+		</h:panelGrid>
+			
+		<h:panelGrid columns="2" style="margin:auto;" >
+			<a4j:commandButton value="Search" action="#{clientBean.search}" render="@all"/>
+			<a4j:commandButton value="Clear criteria" action="#{clientBean.clearSearch}" render="searchResultsGrid #{id}_search_panel"/>
+		</h:panelGrid>		
+			
+		<a4j:outputPanel id="#{id}_searchResultsGrid">
+		<rich:panel id="#{id}_search_results_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty clientBean.searchResults}" 
+				value="No clients found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty clientBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_search_table" rendered="#{clientBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_search_table" value="#{clientBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_clientRegNo" >
+						<f:facet name="header">Registration No</f:facet>
+						<h:outputText value="#{result.clientRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_firstName" >
+						<f:facet name="header">First Name</f:facet>
+						<h:outputText value="#{result.firstName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_lastName">
+						<f:facet name="header">Last Name</f:facet>
+						<h:outputText value="#{result.lastName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_streetName" >
+						<f:facet name="header">Street Name</f:facet>
+						<h:outputText value="#{result.streetName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_streetNo">
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_postalCode">
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_regDate" >
+						<f:facet name="header">Registration Date</f:facet>
+						<h:outputText value="#{result.regDate}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_maxRent" >
+						<f:facet name="header">Max Rent</f:facet>
+						<h:outputText value="#{result.maxRent}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_active" >
+						<f:facet name="header">Active</f:facet>
+						<h:outputText value="#{result.active}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_registeredBy" >
+						<f:facet name="header">Registered By</f:facet>
+						<h:outputText value="#{result.registeredBy}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_preferedTypeId" >
+						<f:facet name="header">Preferred Type ID</f:facet>
+						<h:outputText value="#{result.preferedTypeId}" />
+					</rich:column>
+					
+					<rich:column id="actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{clientBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{clientBean.prepareUpdate(result)}" render="#{id}_update_Grid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton rendered="#{clientBean.searchResults.size() &gt; 1}" value="Delete All" action="#{clientBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+	</rich:panel>
+		
+</ui:composition>
+</html>

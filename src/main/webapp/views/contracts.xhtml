@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition>
+	
+	<a4j:outputPanel id="#{id}_resultsGrid">
+		<rich:panel id="#{id}_results_panel" header="Contracts information currently registered" > 
+			<h:outputText rendered="#{empty contractBean.results}" 
+				value="No contracts are currently registered"/>
+				
+			<rich:panel rendered="#{not empty contractBean.results}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_all_table" rendered="#{contractBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_all_table" value="#{contractBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_contractsNo" >
+						<f:facet name="header">Contract No</f:facet>
+						<h:outputText value="#{result.contractsNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_rent" >
+						<f:facet name="header">Rent</f:facet>
+						<h:outputText value="#{result.rent}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_paymentType" >
+						<f:facet name="header">Payment Type</f:facet>
+						<h:outputText value="#{result.paymentType}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_rentStart" >
+						<f:facet name="header">Rent Start</f:facet>
+						<h:outputText value="#{result.rentStart}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_rentFinish" >
+						<f:facet name="header">Rent Finish</f:facet>
+						<h:outputText value="#{result.rentFinish}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_clientRegNo" >
+						<f:facet name="header">Client Registration No</f:facet>
+						<h:outputText value="#{result.clientRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_propertyRegNo" >
+						<f:facet name="header">Property Registration No</f:facet>
+						<h:outputText value="#{result.propertyRegNo}" />
+					</rich:column>
+					
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="#{id}_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="#{id}_order"
+	                        value="#{contractBean.orderBy}">
+				        <f:selectItem id="#{id}item1" itemLabel="Contract No" itemValue="ContractsNo" />
+				        <f:selectItem id="#{id}item2" itemLabel="Rent" itemValue="Rent" />
+				        <f:selectItem id="#{id}item3" itemLabel="Payment Type" itemValue="PaymentType" />
+				        <f:selectItem id="#{id}item4" itemLabel="Rent Start" itemValue="RentStart" />
+				        <f:selectItem id="#{id}item5" itemLabel="Rent Finish" itemValue="RentFinish" />
+				        <f:selectItem id="#{id}item6" itemLabel="Client Registration No" itemValue="ClientRegistrationNo" />
+				        <f:selectItem id="#{id}item7" itemLabel="Property Registration No" itemValue="PropertyRegistrationNo" />
+				        <f:ajax event="change" listener="#{contractBean.orderResults}" render="#{id}_resultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		<h:panelGrid columns="2" style="width:100%;">
+		<a4j:outputPanel id="#{id}_addGrid">
+		<c:set value="#{contractBean.contract}" var="declaration"/>
+		<rich:panel id="#{id}_add" header="Add contract information" > 
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+	
+					<h:outputText value="Rent" />
+					<h:inputText value="#{declaration.rent}" />
+					
+					<h:outputText value="Payment type" />
+					<d:selectOne value="#{declaration.paymentType}" 
+						methodName="#{codelistController.paymentType}"/>
+						
+					<h:outputText value="Rent start" />
+					<rich:calendar value="#{declaration.rentStart}"/>
+	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+	
+					<h:outputText value="Rent finish" />
+					<rich:calendar value="#{declaration.rentFinish}"/>
+					
+					<h:outputText value="Client Registration No" />
+					<d:selectOne value="#{declaration.clientRegNo}" 
+						methodName="#{codelistController.clientsRegNo}"/>
+					
+					<h:outputText value="Property Registration No" />
+					<d:selectOne value="#{declaration.propertyRegNo}" 
+						methodName="#{codelistController.propertiesRegNo}"/>
+
+	
+				</h:panelGrid>
+			</h:panelGrid>	
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add contract" action="#{contractBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{contractBean.clearAdd}" render="#{id}_addGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+
+		<a4j:outputPanel id="#{id}_updateGrid">
+		<rich:panel id="#{id}_update" header="Update contract information"> 
+		<c:set value="#{contractBean.updateContract}" var="update"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update contract with contract No" style="font-weight: bold;"/>
+				<h:inputText value="#{contractBean.updateContractNo}" />
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+				<h:panelGrid columns="2">
+	
+					<h:outputText value="Rent" />
+					<h:inputText value="#{update.rent}" />
+					
+					<h:outputText value="Payment type" />
+					<d:selectOne value="#{update.paymentType}" 
+						methodName="#{codelistController.paymentType}"/>
+						
+					<h:outputText value="Rent start" />
+					<rich:calendar value="#{update.rentStart}"/>
+	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+	
+					<h:outputText value="Rent finish" />
+					<rich:calendar value="#{update.rentFinish}"/>
+					
+					<h:outputText value="Client Registration No" />
+					<d:selectOne value="#{update.clientRegNo}" 
+						methodName="#{codelistController.clientsRegNo}"/>
+					
+					<h:outputText value="Property Registration No" />
+					<d:selectOne value="#{update.propertyRegNo}" 
+						methodName="#{codelistController.propertiesRegNo}"/>
+
+	
+				</h:panelGrid>
+			</h:panelGrid>	
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update contract" action="#{contractBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{contractBean.clearUpdate}" render="#{id}_updateGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		</h:panelGrid>
+		<c:set value="#{contractBean.searchContract}" var="search"/>
+		<rich:panel id="#{id}_search" header="Search for contract information" style="text-align:center;"> 
+			<h:panelGrid columns="2" style="margin:auto;">
+				<h:panelGrid columns="2">
+	
+					<d:operatorField id="#{id}_rent" label="Rent" 
+						value="#{search.rent}" opValue="#{search.rentOp}"/>
+					
+					<h:outputText value="Payment type" />
+					<d:selectOne value="#{search.paymentType}" 
+						methodName="#{codelistController.paymentType}"/>
+					
+					<d:dateOpField id="rent_start" label="Rent start" 
+						value="#{search.rentStart}" opValue="#{search.rentStartOp}"/>
+	
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+					
+					<d:dateOpField id="rent_finish" label="Rent finish" 
+						value="#{search.rentFinish}" opValue="#{search.rentFinishOp}"/>
+					
+					<h:outputText value="Client Registration No" />
+					<d:selectOne value="#{search.clientRegNo}" 
+						methodName="#{codelistController.clientsRegNo}"/>
+					
+					<h:outputText value="Property Registration No" />
+					<d:selectOne value="#{search.propertyRegNo}" 
+						methodName="#{codelistController.propertiesRegNo}"/>
+
+	
+				</h:panelGrid>
+			</h:panelGrid>	
+			
+			<h:panelGrid columns="2" style="margin:auto;" >
+				<a4j:commandButton value="Search" action="#{contractBean.search}" render="@all"/>
+				<a4j:commandButton value="Clear criteria" action="#{contractBean.clearSearch}" 
+					render="#{id}_searchResultsGrid #{id}_search"/>
+			</h:panelGrid>		
+			
+		<a4j:outputPanel id="#{id}_searchResultsGrid">
+		<rich:panel id="#{id}_search_results_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty contractBean.searchResults}" 
+				value="No contract information found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty contractBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_search_table" rendered="#{contractBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_search_table" value="#{contractBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					
+					<rich:column id="#{id}_search_contractsNo" >
+						<f:facet name="header">Contract No</f:facet>
+						<h:outputText value="#{result.contractsNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_rent" >
+						<f:facet name="header">Rent</f:facet>
+						<h:outputText value="#{result.rent}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_paymentType" >
+						<f:facet name="header">Payment Type</f:facet>
+						<h:outputText value="#{result.paymentType}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_rentStart" >
+						<f:facet name="header">Rent Start</f:facet>
+						<h:outputText value="#{result.rentStart}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_rentFinish" >
+						<f:facet name="header">Rent Finish</f:facet>
+						<h:outputText value="#{result.rentFinish}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_clientRegNo" >
+						<f:facet name="header">Client Registration No</f:facet>
+						<h:outputText value="#{result.clientRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_propertyRegNo" >
+						<f:facet name="header">Property Registration No</f:facet>
+						<h:outputText value="#{result.propertyRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{contractBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{contractBean.prepareUpdate(result)}" render="#{id}_updateGrid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton rendered="#{contractBean.searchResults.size() &gt; 1}" value="Delete All" 
+						action="#{contractBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		</rich:panel>
+
+</ui:composition>
+</html>

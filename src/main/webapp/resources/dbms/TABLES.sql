@@ -135,3 +135,52 @@ create table Advertisements (
 	FOREIGN KEY (NewspaperID) REFERENCES Newspapers(NewspaperID),
 	FOREIGN KEY (PropertyRegistrationNo) REFERENCES Properties(PropertyRegistrationNo)
 );
+
+create table StopAction (
+	reasonToStop VARCHAR(100) NOT NULL,
+	PRIMARY KEY (reasonToStop)
+);
+
+INSERT INTO StopAction VALUES('The selected Property is rented for the selected period');
+
+DELIMITER $$
+CREATE TRIGGER contract_trigger BEFORE INSERT ON Contracts
+FOR EACH ROW BEGIN
+	IF (SELECT count(*) FROM Contracts c
+		WHERE new.PropertyRegistrationNo = c.PropertyRegistrationNo and
+			((c.RentStart <= new.RentStart and c.RentFinish >= new.RentStart)
+			or (c.RentStart <= new.RentFinish and c.RentFinish >= new.RentFinish))) > 0
+	THEN
+		INSERT INTO StopAction VALUES('The selected Property is rented for the selected period');
+	END IF;
+END;$$    
+delimiter ;
+
+DELIMITER $$
+CREATE TRIGGER contract_trigger_update BEFORE UPDATE ON Contracts
+FOR EACH ROW BEGIN
+	IF (SELECT count(*) FROM Contracts c
+		WHERE new.PropertyRegistrationNo = c.PropertyRegistrationNo and
+			((c.RentStart <= new.RentStart and c.RentFinish >= new.RentStart)
+			or (c.RentStart <= new.RentFinish and c.RentFinish >= new.RentFinish))) > 0
+	THEN
+		INSERT INTO StopAction VALUES('The selected Property is rented for the selected period');
+	END IF;
+END;$$  
+delimiter ;
+
+DELIMITER $$
+CREATE TRIGGER activate_client_v AFTER INSERT ON Visits
+FOR EACH ROW BEGIN
+	UPDATE Clients c SET c.Active = 1 
+		WHERE c.ClientRegistrationNo = new.ClientRegistrationNo;
+END;$$    
+delimiter ;
+
+DELIMITER $$
+CREATE TRIGGER activate_client AFTER INSERT ON Contracts
+FOR EACH ROW BEGIN
+	UPDATE Clients c SET c.Active = 1 
+		WHERE c.ClientRegistrationNo = new.ClientRegistrationNo;
+END;$$  
+delimiter ;

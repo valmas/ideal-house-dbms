@@ -16,31 +16,31 @@ import javax.inject.Named;
 
 import com.ntua.db.common.Queries;
 import com.ntua.db.jdbc.JdbcBaseDao;
-import com.ntua.db.jpa.OwnersPhone;
+import com.ntua.db.jpa.ClientsPhone;
 
 /**
- * The Class OwnerPhoneBean.
+ * The Class ClientPhoneBean.
  */
 @ApplicationScoped
-@Named("ownerPhoneBean")
-public class OwnerPhoneBean {
+@Named("clientPhoneBean")
+public class ClientPhoneBean {
 	
-	/** The owner. */
-	private OwnersPhone owner;
+	/** The cl phone. */
+	private ClientsPhone clPhone;
 	
-	/** The search owner. */
-	private OwnersPhone searchOwner;
+	/** The search cl phone. */
+	private ClientsPhone searchClPhone;
 	
-	/** The update owner. */
-	private OwnersPhone updateOwner;
+	/** The update cl phone. */
+	private ClientsPhone updateClPhone;
 	
 	/** The order by. */
 	private String orderBy;
 	
-	/** The update afm. */
-	private String updateAfm;
+	/** The update reg no. */
+	private String updateRegNo;
 	
-	/** The update afm. */
+	/** The update phone. */
 	private String updatePhone;
 	
 	/** The jdbc. */
@@ -51,10 +51,10 @@ public class OwnerPhoneBean {
 	private Connection connection;
 	
 	/** The results. */
-	private List<OwnersPhone> results;
+	private List<ClientsPhone> results;
 	
 	/** The search results. */
-	private List<OwnersPhone> searchResults;
+	private List<ClientsPhone> searchResults;
 	
 	/**
 	 * Inits the.
@@ -62,11 +62,11 @@ public class OwnerPhoneBean {
 	 * @return the string
 	 */
 	public void init(){
-		owner = new OwnersPhone();
-		updateOwner = new OwnersPhone();
-		updateAfm = null;
+		clPhone = new ClientsPhone();
+		updateClPhone = new ClientsPhone();
+		updateRegNo = null;
 		updatePhone = null;
-		orderBy = "AFM";
+		orderBy = "ClientRegistrationNo";
 		clearSearch();
 		selectAll();
 		jdbc.closeConnection(connection);
@@ -81,7 +81,7 @@ public class OwnerPhoneBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = owner.insertQuery();
+			String queryString = clPhone.insertQuery();
 			statement.executeUpdate(queryString);		
 			selectAll();
 			FacesContext.getCurrentInstance().addMessage(null, 
@@ -89,7 +89,7 @@ public class OwnerPhoneBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while inserting data into table OwnerPhones: " +e.getMessage(), null));
+							"Error while inserting data into table ClientPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -99,24 +99,24 @@ public class OwnerPhoneBean {
 	/**
 	 * Delete.
 	 *
-	 * @param ownPhone the own phone
+	 * @param clPhone the cl phone
 	 */
-	public void delete(OwnersPhone ownPhone){
+	public void delete(ClientsPhone clPhone){
 		connection = jdbc.getJdbcConnection();
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = "DELETE FROM OwnerPhones WHERE afm = '" + ownPhone.getAfm() 
-					+"' and phoneNumber='" + ownPhone.getPhoneNumber()+ "'";
+			String queryString = "DELETE FROM ClientPhones WHERE ClientRegistrationNo = '" + clPhone.getRegNo() 
+					+"' and phoneNumber='" + clPhone.getPhoneNumber()+ "'";
 			statement.executeUpdate(queryString);
 			selectAll();
-			removeFromList(ownPhone);
+			removeFromList(clPhone);
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage("Selected entry has been deleted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data into table OwnerPhones: " +e.getMessage(), null));
+							"Error while deleting data into table ClientPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -131,9 +131,9 @@ public class OwnerPhoneBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			for (OwnersPhone own : searchResults) {
-				String queryString = "DELETE FROM OwnerPhones WHERE afm = '" + own.getAfm() 
-						+"' and phoneNumber='" + own.getPhoneNumber()+ "'";
+			for (ClientsPhone cl : searchResults) {
+				String queryString = "DELETE FROM ClientPhones WHERE ClientRegistrationNo = '" + cl.getRegNo() 
+						+"' and phoneNumber='" + cl.getPhoneNumber()+ "'";
 				statement.executeUpdate(queryString);
 			}
 			selectAll();
@@ -143,7 +143,7 @@ public class OwnerPhoneBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data from table OwnerPhones: " +e.getMessage(), null));
+							"Error while deleting data from table ClientPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -153,12 +153,12 @@ public class OwnerPhoneBean {
 	/**
 	 * Removes the from list.
 	 *
-	 * @param ownPhone the own phone
+	 * @param clPhone the cl phone
 	 */
-	private void removeFromList(OwnersPhone ownPhone){
+	private void removeFromList(ClientsPhone clPhone){
 		for (int i=0; i<searchResults.size(); i++) {
-			if(searchResults.get(i).getAfm().equals(ownPhone.getAfm())
-					&& searchResults.get(i).getPhoneNumber().equals(ownPhone.getPhoneNumber())){
+			if(searchResults.get(i).getRegNo().equals(clPhone.getRegNo())
+					&& searchResults.get(i).getPhoneNumber().equals(clPhone.getPhoneNumber())){
 				searchResults.remove(i);
 				return;
 			}
@@ -176,17 +176,17 @@ public class OwnerPhoneBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = searchOwner.searchQuery();
+			String queryString = searchClPhone.searchQuery();
 			resultSet = statement.executeQuery(queryString);
-			searchResults = new ArrayList<OwnersPhone>();
+			searchResults = new ArrayList<ClientsPhone>();
 			while (resultSet.next()) {
-				searchResults.add(populateOwnerPhone(resultSet));
+				searchResults.add(populateClientPhone(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table OwnerPhones: " +e.getMessage(), null));
+							"Error while retrieving data from table ClientPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -198,7 +198,7 @@ public class OwnerPhoneBean {
 	 * Clear search.
 	 */
 	public void clearSearch(){
-		searchOwner = new OwnersPhone();
+		searchClPhone = new ClientsPhone();
 		searchResults = null;
 	}
 	
@@ -206,8 +206,8 @@ public class OwnerPhoneBean {
 	 * Clear update.
 	 */
 	public void clearUpdate(){
-		updateOwner = new OwnersPhone();
-		updateAfm = null;
+		updateClPhone = new ClientsPhone();
+		updateRegNo = null;
 		updatePhone = null;
 	}
 	
@@ -215,18 +215,18 @@ public class OwnerPhoneBean {
 	 * Clear add.
 	 */
 	public void clearAdd(){
-		owner = new OwnersPhone();
+		clPhone = new ClientsPhone();
 	}
 	
 	/**
 	 * Prepare update.
 	 *
-	 * @param ownPhone the own phone
+	 * @param clPhone the cl phone
 	 */
-	public void prepareUpdate(OwnersPhone ownPhone){
-		updateAfm = ownPhone.getAfm();
-		updatePhone = ownPhone.getPhoneNumber();
-		updateOwner = new OwnersPhone(ownPhone);
+	public void prepareUpdate(ClientsPhone clPhone){
+		updateRegNo = clPhone.getRegNo();
+		updatePhone = clPhone.getPhoneNumber();
+		updateClPhone = new ClientsPhone(clPhone);
 	}
 	
 	/**
@@ -237,11 +237,11 @@ public class OwnerPhoneBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = updateOwner.updateQuery(updateAfm, updatePhone);
+			String queryString = updateClPhone.updateQuery(updateRegNo, updatePhone);
 			if(statement.executeUpdate(queryString) == 0){
 				FacesContext.getCurrentInstance().addMessage(null, 
 						new FacesMessage(FacesMessage.SEVERITY_ERROR,
-								"No entries have been updated. Please check if the afm: "+updateAfm+
+								"No entries have been updated. Please check if the registration No: "+updateRegNo+
 								" and phoneNumber: "+updatePhone+" exists", null));
 			} else {
 				selectAll();
@@ -252,7 +252,7 @@ public class OwnerPhoneBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while updating data to table OwnerPhones: "+ e.getMessage(), null));
+							"Error while updating data to table ClientPhones: "+ e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -269,19 +269,19 @@ public class OwnerPhoneBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = Queries.SELECT_ALL_OWNERS_PHONE;
+			String queryString = Queries.SELECT_ALL_CLIENTS_PHONE;
 			if(orderBy != null)
 				queryString += " order by "+orderBy;
 			resultSet = statement.executeQuery(queryString);
-			results = new ArrayList<OwnersPhone>();
+			results = new ArrayList<ClientsPhone>();
 			while (resultSet.next()) {
-				results.add(populateOwnerPhone(resultSet));
+				results.add(populateClientPhone(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table OwnerPhones: " +e.getMessage(), null));
+							"Error while retrieving data from table ClientPhones: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -289,17 +289,17 @@ public class OwnerPhoneBean {
 	}
 	
 	/**
-	 * Populate owner phone.
+	 * Populate client phone.
 	 *
 	 * @param resultSet the result set
-	 * @return the owners phone
+	 * @return the clients phone
 	 * @throws SQLException the SQL exception
 	 */
-	private OwnersPhone populateOwnerPhone(ResultSet resultSet) throws SQLException{
-		OwnersPhone ownPhone = new OwnersPhone();
-		ownPhone.setAfm(resultSet.getString("AFM"));
-		ownPhone.setPhoneNumber(resultSet.getString("PhoneNumber"));
-		return ownPhone;
+	private ClientsPhone populateClientPhone(ResultSet resultSet) throws SQLException{
+		ClientsPhone clPhone = new ClientsPhone();
+		clPhone.setRegNo(resultSet.getString("ClientRegistrationNo"));
+		clPhone.setPhoneNumber(resultSet.getString("PhoneNumber"));
+		return clPhone;
 	}
 	
 	/**
@@ -311,105 +311,6 @@ public class OwnerPhoneBean {
         selectAll();
         jdbc.closeConnection(connection);
     }
-
-	/**
-	 * Gets the owner.
-	 *
-	 * @return the owner
-	 */
-	public OwnersPhone getOwner() {
-		return owner;
-	}
-
-
-	/**
-	 * Sets the owner.
-	 *
-	 * @param owner the new owner
-	 */
-	public void setOwner(OwnersPhone owner) {
-		this.owner = owner;
-	}
-
-
-	/**
-	 * Gets the search owner.
-	 *
-	 * @return the search owner
-	 */
-	public OwnersPhone getSearchOwner() {
-		return searchOwner;
-	}
-
-
-	/**
-	 * Sets the search owner.
-	 *
-	 * @param searchOwner the new search owner
-	 */
-	public void setSearchOwner(OwnersPhone searchOwner) {
-		this.searchOwner = searchOwner;
-	}
-
-
-	/**
-	 * Gets the update owner.
-	 *
-	 * @return the update owner
-	 */
-	public OwnersPhone getUpdateOwner() {
-		return updateOwner;
-	}
-
-
-	/**
-	 * Sets the update owner.
-	 *
-	 * @param updateOwner the new update owner
-	 */
-	public void setUpdateOwner(OwnersPhone updateOwner) {
-		this.updateOwner = updateOwner;
-	}
-
-	/**
-	 * Gets the results.
-	 *
-	 * @return the results
-	 */
-	public List<OwnersPhone> getResults() {
-		return results;
-	}
-
-
-	/**
-	 * Sets the results.
-	 *
-	 * @param results the new results
-	 */
-	public void setResults(List<OwnersPhone> results) {
-		this.results = results;
-	}
-
-
-	/**
-	 * Gets the search results.
-	 *
-	 * @return the search results
-	 */
-	public List<OwnersPhone> getSearchResults() {
-		return searchResults;
-	}
-
-
-	/**
-	 * Sets the search results.
-	 *
-	 * @param searchResults the new search results
-	 */
-	public void setSearchResults(List<OwnersPhone> searchResults) {
-		this.searchResults = searchResults;
-	}
-
 
 	/**
 	 * Gets the order by.
@@ -430,26 +331,6 @@ public class OwnerPhoneBean {
 		this.orderBy = orderBy;
 	}
 
-
-	/**
-	 * Gets the update afm.
-	 *
-	 * @return the update afm
-	 */
-	public String getUpdateAfm() {
-		return updateAfm;
-	}
-
-
-	/**
-	 * Sets the update afm.
-	 *
-	 * @param updateAfm the new update afm
-	 */
-	public void setUpdateAfm(String updateAfm) {
-		this.updateAfm = updateAfm;
-	}
-
 	/**
 	 * Gets the update phone.
 	 *
@@ -468,4 +349,124 @@ public class OwnerPhoneBean {
 		this.updatePhone = updatePhone;
 	}
 
+
+	/**
+	 * Gets the cl phone.
+	 *
+	 * @return the cl phone
+	 */
+	public ClientsPhone getClPhone() {
+		return clPhone;
+	}
+
+
+	/**
+	 * Sets the cl phone.
+	 *
+	 * @param clPhone the new cl phone
+	 */
+	public void setClPhone(ClientsPhone clPhone) {
+		this.clPhone = clPhone;
+	}
+
+
+	/**
+	 * Gets the search cl phone.
+	 *
+	 * @return the search cl phone
+	 */
+	public ClientsPhone getSearchClPhone() {
+		return searchClPhone;
+	}
+
+
+	/**
+	 * Sets the search cl phone.
+	 *
+	 * @param searchClPhone the new search cl phone
+	 */
+	public void setSearchClPhone(ClientsPhone searchClPhone) {
+		this.searchClPhone = searchClPhone;
+	}
+
+
+	/**
+	 * Gets the update cl phone.
+	 *
+	 * @return the update cl phone
+	 */
+	public ClientsPhone getUpdateClPhone() {
+		return updateClPhone;
+	}
+
+
+	/**
+	 * Sets the update cl phone.
+	 *
+	 * @param updateClPhone the new update cl phone
+	 */
+	public void setUpdateClPhone(ClientsPhone updateClPhone) {
+		this.updateClPhone = updateClPhone;
+	}
+
+
+	/**
+	 * Gets the update reg no.
+	 *
+	 * @return the update reg no
+	 */
+	public String getUpdateRegNo() {
+		return updateRegNo;
+	}
+
+
+	/**
+	 * Sets the update reg no.
+	 *
+	 * @param updateRegNo the new update reg no
+	 */
+	public void setUpdateRegNo(String updateRegNo) {
+		this.updateRegNo = updateRegNo;
+	}
+
+
+	/**
+	 * Gets the results.
+	 *
+	 * @return the results
+	 */
+	public List<ClientsPhone> getResults() {
+		return results;
+	}
+
+
+	/**
+	 * Sets the results.
+	 *
+	 * @param results the new results
+	 */
+	public void setResults(List<ClientsPhone> results) {
+		this.results = results;
+	}
+
+
+	/**
+	 * Gets the search results.
+	 *
+	 * @return the search results
+	 */
+	public List<ClientsPhone> getSearchResults() {
+		return searchResults;
+	}
+
+
+	/**
+	 * Sets the search results.
+	 *
+	 * @param searchResults the new search results
+	 */
+	public void setSearchResults(List<ClientsPhone> searchResults) {
+		this.searchResults = searchResults;
+	}
+	
 }

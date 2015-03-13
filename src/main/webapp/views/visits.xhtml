@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition>
+	
+	<a4j:outputPanel id="#{id}_resultsGrid">
+		<rich:panel id="#{id}_results_panel" header="Visits currently registered" > 
+			<h:outputText rendered="#{empty visitBean.results}" 
+				value="No visits' information are currently registered"/>
+				
+			<rich:panel rendered="#{not empty visitBean.results}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_all_table" rendered="#{visitBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_all_table" value="#{visitBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_date" >
+						<f:facet name="header">Date</f:facet>
+						<h:outputText value="#{result.date}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_clientRegNo" >
+						<f:facet name="header">Client Registration No</f:facet>
+						<h:outputText value="#{result.clientRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_propertyRegNo" >
+						<f:facet name="header">Property Registration No</f:facet>
+						<h:outputText value="#{result.propertyRegNo}" />
+					</rich:column>
+					
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="#{id}_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="#{id}_order"
+	                        value="#{visitBean.orderBy}">
+				        <f:selectItem id="#{id}item1" itemLabel="Date" itemValue="Date" />
+				        <f:selectItem id="#{id}item2" itemLabel="Client Registration No" itemValue="ClientRegistrationNo" />
+				        <f:selectItem id="#{id}item3" itemLabel="Property Registration No" itemValue="PropertyRegistrationNo" />
+				        <f:ajax event="change" listener="#{visitBean.orderResults}" render="#{id}_resultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		<h:panelGrid columns="2" style="width:100%;">
+		<a4j:outputPanel id="#{id}_addGrid">
+		<c:set value="#{visitBean.visit}" var="declaration"/>
+		<rich:panel id="#{id}_add" header="Add visit information" > 
+			<h:panelGrid columns="2">
+
+				<h:outputText value="Date" />
+				<rich:calendar value="#{declaration.date}"/>
+				
+				<h:outputText value="Client Registration No" />
+				<d:selectOne value="#{declaration.clientRegNo}" 
+					methodName="#{codelistController.clientsRegNo}"/>
+				
+				<h:outputText value="Property Registration No" />
+				<d:selectOne value="#{declaration.propertyRegNo}" 
+					methodName="#{codelistController.propertiesRegNo}"/>
+
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add visit" action="#{visitBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{visitBean.clearAdd}" render="#{id}_addGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+
+		<a4j:outputPanel id="#{id}_updateGrid">
+		<rich:panel id="#{id}_update" header="Update visit information"> 
+		<c:set value="#{visitBean.updateVisit}" var="update"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update visit informaton at" style="font-weight: bold;"/>
+				<rich:calendar value="#{visitBean.updateDate}" />
+				<h:outputText value="with Client Registration No" style="font-weight: bold;"/>
+				<d:selectOne value="#{visitBean.updateClRegNo}" 
+					methodName="#{codelistController.clientsRegNo}"/>
+				<h:outputText value="and Property Registration No" style="font-weight: bold;"/>
+				<d:selectOne value="#{visitBean.updatePropRegNo}" 
+					methodName="#{codelistController.propertiesRegNo}"/>
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+			
+				<h:outputText value="Date" />
+				<rich:calendar value="#{update.date}"/>
+				
+				<h:outputText value="Client Registration No" />
+				<d:selectOne value="#{update.clientRegNo}" 
+					methodName="#{codelistController.clientsRegNo}"/>
+				
+				<h:outputText value="Property Registration No" />
+				<d:selectOne value="#{update.propertyRegNo}" 
+					methodName="#{codelistController.propertiesRegNo}"/>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update visit" action="#{visitBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{visitBean.clearUpdate}" render="#{id}_updateGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		</h:panelGrid>
+		<c:set value="#{visitBean.searchVisit}" var="search"/>
+		<rich:panel id="#{id}_search" header="Search for visits' information" style="text-align:center;"> 
+			<h:panelGrid columns="2" style="margin:auto;">
+			
+				<d:dateOpField id="date" label="Date" 
+					value="#{search.date}" opValue="#{search.dateOp}"/>
+				
+				<d:operatorField id="#{id}_clientRegNo" label="Client Registration No" 
+					value="#{search.clientRegNo}" opValue="#{search.clientRegNoOp}"/>
+					
+				<d:operatorField id="#{id}_propertyRegNo" label="Property Registration No" 
+					value="#{search.propertyRegNo}" opValue="#{search.propertyRegNoOp}"/>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" style="margin:auto;" >
+				<a4j:commandButton value="Search" action="#{visitBean.search}" render="@all"/>
+				<a4j:commandButton value="Clear criteria" action="#{visitBean.clearSearch}" 
+					render="#{id}_searchResultsGrid #{id}_search"/>
+			</h:panelGrid>		
+			
+		<a4j:outputPanel id="#{id}_searchResultsGrid">
+		<rich:panel id="#{id}_search_results_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty visitBean.searchResults}" 
+				value="No visits found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty visitBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_search_table" rendered="#{visitBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_search_table" value="#{visitBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					
+					<rich:column id="#{id}_search_date" >
+						<f:facet name="header">Date</f:facet>
+						<h:outputText value="#{result.date}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_clientRegNo" >
+						<f:facet name="header">Client Registration No</f:facet>
+						<h:outputText value="#{result.clientRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_propertyRegNo" >
+						<f:facet name="header">Property Registration No</f:facet>
+						<h:outputText value="#{result.propertyRegNo}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{visitBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{visitBean.prepareUpdate(result)}" render="#{id}_updateGrid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton rendered="#{visitBean.searchResults.size() &gt; 1}" value="Delete All" 
+						action="#{visitBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		</rich:panel>
+
+</ui:composition>
+</html>

@@ -43,6 +43,33 @@ public class CodelistController {
 		return list;
 	}
 	
+	public List<String> getDateOperators(){
+		List<String> list = new ArrayList<String>();
+		list.add("=");
+		list.add(">");
+		list.add("<");
+		list.add("not null");
+		list.add("null");
+		return list;
+	}
+	
+	public List<CodeListItem> getPaymentType(){
+		List<CodeListItem> list = new ArrayList<CodeListItem>();
+		list.add(empty);
+		list.add(new CodeListItem("cash", "cash", false));
+		list.add(new CodeListItem("cheque", "cheque", false));
+		list.add(new CodeListItem("visa", "visa", false));
+		return list;
+	}
+	
+	public List<CodeListItem> getBoolean(){
+		List<CodeListItem> list = new ArrayList<CodeListItem>();
+		list.add(empty);
+		list.add(new CodeListItem("true", "YES", false));
+		list.add(new CodeListItem("false", "NO", false));
+		return list;
+	}
+	
 	public List<CodeListItem> getEmployeesAfm(){
 		Connection connection = jdbc.getJdbcConnection();
 		Statement statement = null;
@@ -113,12 +140,63 @@ public class CodelistController {
 			resultSet = statement.executeQuery(Queries.PROPERTY_TYPE_ID);
 			while (resultSet.next()) {
 				String value = resultSet.getString("PropertyTypeID");
-				list.add(new CodeListItem(value, "", false));
+				list.add(new CodeListItem(value, value, false));
 			}
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_FATAL,
 							"Error while executing: "+ Queries.EMPLOYEE_AFM +" " +e.getMessage(), null));
+		} finally {
+			jdbc.freeResultSet(resultSet);
+			jdbc.freeStatement(statement);
+			jdbc.closeConnection(connection);
+		}
+		return list;
+	}
+	
+	public List<CodeListItem> getClientsRegNo(){
+		Connection connection = jdbc.getJdbcConnection();
+		Statement statement = null;
+		ResultSet resultSet = null;
+		List<CodeListItem> list = new ArrayList<CodeListItem>();
+		list.add(empty);
+		try{
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery(Queries.CLIENTS_REG_NO);
+			while (resultSet.next()) {
+				String value = resultSet.getString("ClientRegistrationNo");
+				String description = resultSet.getString("LastName");
+				list.add(new CodeListItem(value, description, true));
+			}
+		} catch (SQLException e) {
+			FacesContext.getCurrentInstance().addMessage(null, 
+					new FacesMessage(FacesMessage.SEVERITY_FATAL,
+							"Error while executing: "+ Queries.CLIENTS_REG_NO +" " +e.getMessage(), null));
+		} finally {
+			jdbc.freeResultSet(resultSet);
+			jdbc.freeStatement(statement);
+			jdbc.closeConnection(connection);
+		}
+		return list;
+	}
+	
+	public List<CodeListItem> getPropertiesRegNo(){
+		Connection connection = jdbc.getJdbcConnection();
+		Statement statement = null;
+		ResultSet resultSet = null;
+		List<CodeListItem> list = new ArrayList<CodeListItem>();
+		list.add(empty);
+		try{
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery(Queries.PROPERTY_REG_NO);
+			while (resultSet.next()) {
+				String value = resultSet.getString("PropertyRegistrationNo");
+				list.add(new CodeListItem(value, value, false));
+			}
+		} catch (SQLException e) {
+			FacesContext.getCurrentInstance().addMessage(null, 
+					new FacesMessage(FacesMessage.SEVERITY_FATAL,
+							"Error while executing: "+ Queries.PROPERTY_REG_NO +" " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);

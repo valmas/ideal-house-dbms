@@ -12,6 +12,10 @@
 		<tag-name>strOpField</tag-name>
 		<source>../components/strOpField.xhtml</source>
 	</tag>
+	<tag>
+		<tag-name>dateOpField</tag-name>
+		<source>../components/dateOpField.xhtml</source>
+	</tag>
 	
 	<tag>
 		<tag-name>selectOne</tag-name>

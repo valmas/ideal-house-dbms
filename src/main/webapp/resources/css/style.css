@@ -184,9 +184,9 @@ ul#menu li a:hover
 { color: #E4EC04;}
 
 #site_content
-{ width: 1000px;
+{ margin-left:100px;
   overflow: hidden;
-  margin: 20px auto 0 auto;
+  margin: 20px auto 10px 100px;
   padding: 0 0 50px 0;} 
 
 #content_header
@@ -395,4 +395,7 @@ table tr td
 	background: none !important;
 	border: none !important;
 	font-size: 13px !important;
+}
+.calendar input {
+	margin-left: 0px;
 }

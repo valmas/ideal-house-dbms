@@ -14,34 +14,30 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.ntua.db.common.Queries;
 import com.ntua.db.jdbc.JdbcBaseDao;
-import com.ntua.db.jpa.OwnersPhone;
+import com.ntua.db.jpa.Contract;
 
 /**
- * The Class OwnerPhoneBean.
+ * The Class ContractBean.
  */
 @ApplicationScoped
-@Named("ownerPhoneBean")
-public class OwnerPhoneBean {
+@Named("contractBean")
+public class ContractBean {
+
+	/** The contract. */
+	private Contract contract;
 	
-	/** The owner. */
-	private OwnersPhone owner;
+	/** The search contract. */
+	private Contract searchContract;
 	
-	/** The search owner. */
-	private OwnersPhone searchOwner;
-	
-	/** The update owner. */
-	private OwnersPhone updateOwner;
+	/** The update contract. */
+	private Contract updateContract;
 	
 	/** The order by. */
 	private String orderBy;
 	
-	/** The update afm. */
-	private String updateAfm;
-	
-	/** The update afm. */
-	private String updatePhone;
+	/** The update contract no. */
+	private String updateContractNo;
 	
 	/** The jdbc. */
 	@Inject
@@ -51,25 +47,25 @@ public class OwnerPhoneBean {
 	private Connection connection;
 	
 	/** The results. */
-	private List<OwnersPhone> results;
+	private List<Contract> results;
 	
 	/** The search results. */
-	private List<OwnersPhone> searchResults;
+	private List<Contract> searchResults;
 	
 	/**
 	 * Inits the.
 	 *
 	 * @return the string
 	 */
-	public void init(){
-		owner = new OwnersPhone();
-		updateOwner = new OwnersPhone();
-		updateAfm = null;
-		updatePhone = null;
-		orderBy = "AFM";
+	public String init(){
+		contract = new Contract();
+		updateContract = new Contract();
+		updateContractNo = null;
+		orderBy = "ContractsNo";
 		clearSearch();
 		selectAll();
 		jdbc.closeConnection(connection);
+		return "/views/clients.xhtml?faces-redirect=true";
 	}
 	
 	
@@ -81,7 +77,7 @@ public class OwnerPhoneBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = owner.insertQuery();
+			String queryString = contract.insertQuery();
 			statement.executeUpdate(queryString);		
 			selectAll();
 			FacesContext.getCurrentInstance().addMessage(null, 
@@ -89,7 +85,7 @@ public class OwnerPhoneBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while inserting data into table OwnerPhones: " +e.getMessage(), null));
+							"Error while inserting data into table Contracts: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -99,24 +95,23 @@ public class OwnerPhoneBean {
 	/**
 	 * Delete.
 	 *
-	 * @param ownPhone the own phone
+	 * @param contract the contract
 	 */
-	public void delete(OwnersPhone ownPhone){
+	public void delete(Contract contract){
 		connection = jdbc.getJdbcConnection();
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = "DELETE FROM OwnerPhones WHERE afm = '" + ownPhone.getAfm() 
-					+"' and phoneNumber='" + ownPhone.getPhoneNumber()+ "'";
-			statement.executeUpdate(queryString);
+			String queryString = "DELETE FROM Contracts WHERE ContractsNo = " + contract.getContractsNo() ;
+			statement.executeUpdate(queryString);		
 			selectAll();
-			removeFromList(ownPhone);
+			removeFromList(contract);
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage("Selected entry has been deleted successfully"));
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data into table OwnerPhones: " +e.getMessage(), null));
+							"Error while deleting data into table Contracts: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -131,10 +126,9 @@ public class OwnerPhoneBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			for (OwnersPhone own : searchResults) {
-				String queryString = "DELETE FROM OwnerPhones WHERE afm = '" + own.getAfm() 
-						+"' and phoneNumber='" + own.getPhoneNumber()+ "'";
-				statement.executeUpdate(queryString);
+			for (Contract contract : searchResults) {
+				String queryString = "DELETE FROM Contracts WHERE ContractsNo = " + contract.getContractsNo();
+				statement.executeUpdate(queryString);		
 			}
 			selectAll();
 			clearSearch();
@@ -143,7 +137,7 @@ public class OwnerPhoneBean {
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while deleting data from table OwnerPhones: " +e.getMessage(), null));
+							"Error while deleting data from table Contracts: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -153,12 +147,11 @@ public class OwnerPhoneBean {
 	/**
 	 * Removes the from list.
 	 *
-	 * @param ownPhone the own phone
+	 * @param contract the contract
 	 */
-	private void removeFromList(OwnersPhone ownPhone){
+	private void removeFromList(Contract contract){
 		for (int i=0; i<searchResults.size(); i++) {
-			if(searchResults.get(i).getAfm().equals(ownPhone.getAfm())
-					&& searchResults.get(i).getPhoneNumber().equals(ownPhone.getPhoneNumber())){
+			if(searchResults.get(i).getContractsNo().equals(contract.getContractsNo())){
 				searchResults.remove(i);
 				return;
 			}
@@ -176,17 +169,17 @@ public class OwnerPhoneBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = searchOwner.searchQuery();
+			String queryString = searchContract.searchQuery();
 			resultSet = statement.executeQuery(queryString);
-			searchResults = new ArrayList<OwnersPhone>();
+			searchResults = new ArrayList<Contract>();
 			while (resultSet.next()) {
-				searchResults.add(populateOwnerPhone(resultSet));
+				searchResults.add(populateContracts(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table OwnerPhones: " +e.getMessage(), null));
+							"Error while retrieving data from table Contracts: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -198,7 +191,7 @@ public class OwnerPhoneBean {
 	 * Clear search.
 	 */
 	public void clearSearch(){
-		searchOwner = new OwnersPhone();
+		searchContract = new Contract();
 		searchResults = null;
 	}
 	
@@ -206,27 +199,25 @@ public class OwnerPhoneBean {
 	 * Clear update.
 	 */
 	public void clearUpdate(){
-		updateOwner = new OwnersPhone();
-		updateAfm = null;
-		updatePhone = null;
+		updateContract = new Contract();
+		updateContractNo = null;
 	}
 	
 	/**
 	 * Clear add.
 	 */
 	public void clearAdd(){
-		owner = new OwnersPhone();
+		contract = new Contract();
 	}
 	
 	/**
 	 * Prepare update.
 	 *
-	 * @param ownPhone the own phone
+	 * @param contract the contract
 	 */
-	public void prepareUpdate(OwnersPhone ownPhone){
-		updateAfm = ownPhone.getAfm();
-		updatePhone = ownPhone.getPhoneNumber();
-		updateOwner = new OwnersPhone(ownPhone);
+	public void prepareUpdate(Contract contract){
+		updateContractNo = contract.getContractsNo();
+		updateContract = new Contract(contract);
 	}
 	
 	/**
@@ -237,22 +228,22 @@ public class OwnerPhoneBean {
 		Statement statement = null;
 		try{
 			statement = connection.createStatement();
-			String queryString = updateOwner.updateQuery(updateAfm, updatePhone);
+			String queryString = updateContract.updateQuery(updateContractNo);
 			if(statement.executeUpdate(queryString) == 0){
 				FacesContext.getCurrentInstance().addMessage(null, 
 						new FacesMessage(FacesMessage.SEVERITY_ERROR,
-								"No entries have been updated. Please check if the afm: "+updateAfm+
-								" and phoneNumber: "+updatePhone+" exists", null));
+								"No entries have been updated. Please check if the Contract No: "+updateContractNo+" exists", null));
 			} else {
 				selectAll();
 				clearSearch();
 				FacesContext.getCurrentInstance().addMessage(null, 
 						new FacesMessage("The selected entry has been updated successfully"));
 			}
+			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while updating data to table OwnerPhones: "+ e.getMessage(), null));
+							"Error while updating data to table Contracts: "+ e.getMessage(), null));
 		} finally {
 			jdbc.freeStatement(statement);
 			jdbc.closeConnection(connection);
@@ -269,19 +260,19 @@ public class OwnerPhoneBean {
 			if (connection == null || connection.isClosed())
 				connection = jdbc.getJdbcConnection();
 			statement = connection.createStatement();
-			String queryString = Queries.SELECT_ALL_OWNERS_PHONE;
+			String queryString = "Select * from Contracts";
 			if(orderBy != null)
 				queryString += " order by "+orderBy;
 			resultSet = statement.executeQuery(queryString);
-			results = new ArrayList<OwnersPhone>();
+			results = new ArrayList<Contract>();
 			while (resultSet.next()) {
-				results.add(populateOwnerPhone(resultSet));
+				results.add(populateContracts(resultSet));
 			}
 			
 		} catch (SQLException e) {
 			FacesContext.getCurrentInstance().addMessage(null, 
 					new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Error while retrieving data from table OwnerPhones: " +e.getMessage(), null));
+							"Error while retrieving data from table Contracts: " +e.getMessage(), null));
 		} finally {
 			jdbc.freeResultSet(resultSet);
 			jdbc.freeStatement(statement);
@@ -289,17 +280,22 @@ public class OwnerPhoneBean {
 	}
 	
 	/**
-	 * Populate owner phone.
+	 * Populate contracts.
 	 *
 	 * @param resultSet the result set
-	 * @return the owners phone
+	 * @return the contract
 	 * @throws SQLException the SQL exception
 	 */
-	private OwnersPhone populateOwnerPhone(ResultSet resultSet) throws SQLException{
-		OwnersPhone ownPhone = new OwnersPhone();
-		ownPhone.setAfm(resultSet.getString("AFM"));
-		ownPhone.setPhoneNumber(resultSet.getString("PhoneNumber"));
-		return ownPhone;
+	private Contract populateContracts(ResultSet resultSet) throws SQLException{
+		Contract contract = new Contract();
+		contract.setClientRegNo(resultSet.getString("ClientRegistrationNo"));
+		contract.setPropertyRegNo(resultSet.getString("PropertyRegistrationNo"));
+		contract.setContractsNo(resultSet.getString("ContractsNo"));
+		contract.setRentStart(resultSet.getDate("RentStart"));
+		contract.setRentFinish(resultSet.getDate("RentFinish"));
+		contract.setRent(resultSet.getBigDecimal("Rent"));
+		contract.setPaymentType(resultSet.getString("PaymentType"));
+		return contract;
 	}
 	
 	/**
@@ -312,102 +308,64 @@ public class OwnerPhoneBean {
         jdbc.closeConnection(connection);
     }
 
+
 	/**
-	 * Gets the owner.
+	 * Gets the contract.
 	 *
-	 * @return the owner
+	 * @return the contract
 	 */
-	public OwnersPhone getOwner() {
-		return owner;
+	public Contract getContract() {
+		return contract;
 	}
 
 
 	/**
-	 * Sets the owner.
+	 * Sets the contract.
 	 *
-	 * @param owner the new owner
+	 * @param contract the new contract
 	 */
-	public void setOwner(OwnersPhone owner) {
-		this.owner = owner;
+	public void setContract(Contract contract) {
+		this.contract = contract;
 	}
 
 
 	/**
-	 * Gets the search owner.
+	 * Gets the search contract.
 	 *
-	 * @return the search owner
+	 * @return the search contract
 	 */
-	public OwnersPhone getSearchOwner() {
-		return searchOwner;
+	public Contract getSearchContract() {
+		return searchContract;
 	}
 
 
 	/**
-	 * Sets the search owner.
+	 * Sets the search contract.
 	 *
-	 * @param searchOwner the new search owner
+	 * @param searchContract the new search contract
 	 */
-	public void setSearchOwner(OwnersPhone searchOwner) {
-		this.searchOwner = searchOwner;
+	public void setSearchContract(Contract searchContract) {
+		this.searchContract = searchContract;
 	}
 
 
 	/**
-	 * Gets the update owner.
+	 * Gets the update contract.
 	 *
-	 * @return the update owner
+	 * @return the update contract
 	 */
-	public OwnersPhone getUpdateOwner() {
-		return updateOwner;
+	public Contract getUpdateContract() {
+		return updateContract;
 	}
 
 
 	/**
-	 * Sets the update owner.
+	 * Sets the update contract.
 	 *
-	 * @param updateOwner the new update owner
+	 * @param updateContract the new update contract
 	 */
-	public void setUpdateOwner(OwnersPhone updateOwner) {
-		this.updateOwner = updateOwner;
-	}
-
-	/**
-	 * Gets the results.
-	 *
-	 * @return the results
-	 */
-	public List<OwnersPhone> getResults() {
-		return results;
-	}
-
-
-	/**
-	 * Sets the results.
-	 *
-	 * @param results the new results
-	 */
-	public void setResults(List<OwnersPhone> results) {
-		this.results = results;
-	}
-
-
-	/**
-	 * Gets the search results.
-	 *
-	 * @return the search results
-	 */
-	public List<OwnersPhone> getSearchResults() {
-		return searchResults;
-	}
-
-
-	/**
-	 * Sets the search results.
-	 *
-	 * @param searchResults the new search results
-	 */
-	public void setSearchResults(List<OwnersPhone> searchResults) {
-		this.searchResults = searchResults;
+	public void setUpdateContract(Contract updateContract) {
+		this.updateContract = updateContract;
 	}
 
 
@@ -432,40 +390,62 @@ public class OwnerPhoneBean {
 
 
 	/**
-	 * Gets the update afm.
+	 * Gets the update contract no.
 	 *
-	 * @return the update afm
+	 * @return the update contract no
 	 */
-	public String getUpdateAfm() {
-		return updateAfm;
+	public String getUpdateContractNo() {
+		return updateContractNo;
 	}
 
 
 	/**
-	 * Sets the update afm.
+	 * Sets the update contract no.
 	 *
-	 * @param updateAfm the new update afm
+	 * @param updateContractNo the new update contract no
 	 */
-	public void setUpdateAfm(String updateAfm) {
-		this.updateAfm = updateAfm;
+	public void setUpdateContractNo(String updateContractNo) {
+		this.updateContractNo = updateContractNo;
 	}
 
-	/**
-	 * Gets the update phone.
-	 *
-	 * @return the update phone
-	 */
-	public String getUpdatePhone() {
-		return updatePhone;
-	}
 
 	/**
-	 * Sets the update phone.
+	 * Gets the results.
 	 *
-	 * @param updatePhone the new update phone
+	 * @return the results
 	 */
-	public void setUpdatePhone(String updatePhone) {
-		this.updatePhone = updatePhone;
+	public List<Contract> getResults() {
+		return results;
+	}
+
+
+	/**
+	 * Sets the results.
+	 *
+	 * @param results the new results
+	 */
+	public void setResults(List<Contract> results) {
+		this.results = results;
+	}
+
+
+	/**
+	 * Gets the search results.
+	 *
+	 * @return the search results
+	 */
+	public List<Contract> getSearchResults() {
+		return searchResults;
+	}
+
+
+	/**
+	 * Sets the search results.
+	 *
+	 * @param searchResults the new search results
+	 */
+	public void setSearchResults(List<Contract> searchResults) {
+		this.searchResults = searchResults;
 	}
 
 }

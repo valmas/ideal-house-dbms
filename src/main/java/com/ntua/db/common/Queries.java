@@ -17,4 +17,10 @@ public class Queries {
 			+ ", FirstName, LastName from Owners o JOIN PrivateOwners p on o.afm = p.afm";
 	
 	public static final String SELECT_ALL_OWNERS_PHONE = "Select * FROM OwnerPhones";
+	
+	public static final String SELECT_ALL_CLIENTS_PHONE = "Select * FROM ClientPhones";
+	
+	public static final String CLIENTS_REG_NO = "Select ClientRegistrationNo,lastName FROM Clients";
+	
+	public static final String PROPERTY_REG_NO = "Select PropertyRegistrationNo FROM Properties";
 }
