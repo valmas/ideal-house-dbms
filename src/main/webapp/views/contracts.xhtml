@@ -186,13 +186,11 @@
 					<d:dateOpField id="rent_finish" label="Rent finish" 
 						value="#{search.rentFinish}" opValue="#{search.rentFinishOp}"/>
 					
-					<h:outputText value="Client Registration No" />
-					<d:selectOne value="#{search.clientRegNo}" 
-						methodName="#{codelistController.clientsRegNo}"/>
+					<d:operatorField id="#{id}_clientRegNo" label="Client Registration No" 
+						value="#{search.clientRegNo}" opValue="#{search.clientRegNoOp}"/>
 					
-					<h:outputText value="Property Registration No" />
-					<d:selectOne value="#{search.propertyRegNo}" 
-						methodName="#{codelistController.propertiesRegNo}"/>
+					<d:operatorField id="#{id}_propertyRegNo" label="Property Registration No" 
+						value="#{search.propertyRegNo}" opValue="#{search.propertyRegNoOp}"/>
 
 	
 				</h:panelGrid>

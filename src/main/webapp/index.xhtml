@@ -11,69 +11,112 @@
 	<ui:define name="menu">
 		<ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li class="selected"><h:commandLink action="#{helloWorldBean.init}" value="Home"/></li>
+          <li class="selected"><h:commandLink action="#{homeBean.init}" value="Clients"/></li>
           <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
           <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
           <li><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
           <li><h:commandLink action="#{clientBean.init}" value="Clients"/></li>
-          <li><a href="examples.xhtml">Advertisement</a></li>
+          <li><h:commandLink action="#{newspaperBean.init}" value="Advertisements"/></li>
         </ul>
 	</ui:define>
 	<ui:define name="content">
-		<rich:panel id="form_panel" header="Form"> 
-			<h:panelGrid columns="2">
-				<h:outputText value="name" />
-				<h:inputText value="#{dbForm.name}" label="sfsdf" />
-				
-				<h:outputText value="age" />
-				<h:inputText value="#{dbForm.age}" label="sfsdf" />
-				
-				<h:outputText value="date Of birth" />
-				<rich:calendar value="#{dbForm.dateOfBirth}" /> 
-			</h:panelGrid>
-			
-			<h:panelGrid columns="2">
-				<h:commandButton value="Go to View" action="#{employeeBean.init}" />
-				<a4j:commandButton value="submit" action="#{helloWorldBean.doQuery}" render="resultsGrid"  />
-			</h:panelGrid>		
-		</rich:panel>
+		<rich:panel id="mw_results_panel" header="Most wanted properties"> 
 		
-		<a4j:outputPanel id="resultsGrid">
-		<rich:panel id="results_panel" header="Results"> 
-		
-			<h:panelGroup rendered="#{helloWorldBean.results != null }">
-		
-				<rich:dataTable id="declaration_requests_table" value="#{helloWorldBean.results}" 
-					var="result" rows="20" style="white-space:nowrap; width:100%;">
-					<rich:column id="PID" >
-						<f:facet name="header">PID</f:facet>
-						<h:outputText value="#{result.pid}" />
+			<h:panelGroup rendered="#{homeBean.mostWanted != null }">
+				<rich:dataScroller for="most_wanted_table" rendered="#{homeBean.mostWanted.size() &gt; 10}"/>
+				<rich:dataTable id="most_wanted_table" value="#{homeBean.mostWanted}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="contracts_num" >
+						<f:facet name="header">Number of contracts</f:facet>
+						<h:outputText value="#{result.contracts_num}" />
 					</rich:column>
 					
-					<rich:column id="lastName" >
-						<f:facet name="header">Last Name</f:facet>
-						<h:outputText value="#{result.lastName}" />
+					<rich:column id="mw_streetName" >
+						<f:facet name="header">Street Name</f:facet>
+						<h:outputText value="#{result.streetName}" />
 					</rich:column>
 					
-					<rich:column id="firstName">
-						<f:facet name="header">First Name</f:facet>
-						<h:outputText value="#{result.firstName}" />
+					<rich:column id="mw_streetNo">
+						<f:facet name="header">Street No</f:facet>
+						<h:outputText value="#{result.streetNo}" />
 					</rich:column>
 					
-					<rich:column id="address" >
-						<f:facet name="header">Address</f:facet>
-						<h:outputText value="#{result.address}" />
+					<rich:column id="mw_postalCode">
+						<f:facet name="header">Postal code</f:facet>
+						<h:outputText value="#{result.postalCode}" />
 					</rich:column>
 					
-					<rich:column id="city" >
-						<f:facet name="header">City</f:facet>
-						<h:outputText value="#{result.city}" />
+					<rich:column id="mw_size" >
+						<f:facet name="header">Size</f:facet>
+						<h:outputText value="#{result.size}" />
+					</rich:column>
+					
+					<rich:column id="mw_floor" >
+						<f:facet name="header">Floor</f:facet>
+						<h:outputText value="#{result.floor}" />
+					</rich:column>
+					
+					<rich:column id="mw_rent" >
+						<f:facet name="header">Rent</f:facet>
+						<h:outputText value="#{result.rent}" />
+					</rich:column>
+					
+					<rich:column id="mw_Rooms" >
+						<f:facet name="header">Rooms</f:facet>
+						<h:outputText value="#{result.rooms}" />
+					</rich:column>
+					
+					<rich:column id="mw_Description">
+						<f:facet name="header">Description</f:facet>
+						<h:outputText value="#{result.description}" />
+					</rich:column>
+					
+					<rich:column id="mw_status">
+						<f:facet name="header">Status</f:facet>
+						<h:outputText value="#{result.status}" />
 					</rich:column>
 					
 				</rich:dataTable>
 			</h:panelGroup>
 		</rich:panel>
-		</a4j:outputPanel>
+		
+		<rich:panel header="Best Clients (with total rent more than the average)"> 
+			<h:panelGroup rendered="#{homeBean.bestClients != null }">
+				<rich:dataScroller for="bestClients_table" rendered="#{homeBean.bestClients.size() &gt; 10}"/>
+				<rich:dataTable id="bestClients_table" value="#{homeBean.bestClients}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="bc_first_name" >
+						<f:facet name="header">First Name</f:facet>
+						<h:outputText value="#{result.firstName}" />
+					</rich:column>
+					
+					<rich:column id="bc_last_name">
+						<f:facet name="header">Last Name</f:facet>
+						<h:outputText value="#{result.lastName}" />
+					</rich:column>
+					
+					<rich:column id="bc_total_rent">
+						<f:facet name="header">Total Rent</f:facet>
+						<h:outputText value="#{result.rent}" />
+					</rich:column>
+					
+				</rich:dataTable>
+			</h:panelGroup>
+		</rich:panel>
+		
+		<rich:panel header="Employees Statistics"> 
+			<h:panelGrid columns="2">
+				<h:outputText value="Highest Salary:" style="font-weight: bold;"/>
+				<h:outputText value="#{homeBean.highSal}" />
+				
+				<h:outputText value="Lowest Salary:" style="font-weight: bold;"/>
+				<h:outputText value="#{homeBean.lowSal}" />
+				
+				<h:outputText value="Average Salary:" style="font-weight: bold;"/>
+				<h:outputText value="#{homeBean.avgSal}" />
+				
+			</h:panelGrid>
+		</rich:panel>
 	</ui:define>
 </ui:composition>
 </html>

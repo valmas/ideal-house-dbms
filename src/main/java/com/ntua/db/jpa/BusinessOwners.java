@@ -237,14 +237,14 @@ public class BusinessOwners extends Owners {
 	 * @return the string
 	 */
 	public String searchQuery(){
-		String query = "SELECT * FROM Owners o, BusinessOwners b where o.afm = b.afm and";
+		String query = "SELECT * FROM VW_B_OWNERS where";
 		query = query + parentSearchQuery();
 		query = query + Utils.constructSearchQuery(businessNameOp, businessName, " BusinessName");
 		query = query + Utils.constructSearchQuery(businessTypeOp, businessType, " BusinessType");
 		query = query + Utils.constructSearchQuery(contactFirstNameOp, contactFirstName, " ContactFirstName");
 		query = query + Utils.constructSearchQuery(contactLastNameOp, contactLastName, " ContactLastName");
 		if(query.endsWith("WHERE"))
-			query = query.substring(0, query.length()-8);
+			query = query.substring(0, query.length()-6);
 		else
 			query = query.substring(0, query.length()-3);
 		return query;

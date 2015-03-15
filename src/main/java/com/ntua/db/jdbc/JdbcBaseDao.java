@@ -21,9 +21,6 @@ public class JdbcBaseDao {
 	private static final String JUNIT_CONNECTION_PASSWORD = "1234";
 	
 	
-	/*
-	 * This method is used for JUnit tests only
-	 */
 	public Connection getJdbcConnection() {
 		Connection conn;
 		try {

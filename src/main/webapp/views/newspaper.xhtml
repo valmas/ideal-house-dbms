@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a4j="http://richfaces.org/a4j"
+    xmlns:rich="http://richfaces.org/rich"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:d="http://ntua.db/facelets">
+
+<ui:composition>
+	
+	<a4j:outputPanel id="#{id}_resultsGrid">
+		<rich:panel id="#{id}_results_panel" header="Newspapers currently registered" > 
+			<h:outputText rendered="#{empty newspaperBean.results}" 
+				value="No newspapers are currently registered"/>
+				
+			<rich:panel rendered="#{not empty newspaperBean.results}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_all_table" rendered="#{newspaperBean.results.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_all_table" value="#{newspaperBean.results}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					<rich:column id="#{id}_newsID" >
+						<f:facet name="header">Newspaper Id</f:facet>
+						<h:outputText value="#{result.newspaperId}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_news_name" >
+						<f:facet name="header">Newspaper name</f:facet>
+						<h:outputText value="#{result.newspaperName}" />
+					</rich:column>
+					
+				</rich:dataTable>
+				
+				<h:panelGrid columns="2" style="float:right;">
+					<h:outputText id="#{id}_order_txt" value="Order by:" style="font-weight: bold;"/>
+				
+					<h:selectOneMenu id="#{id}_order"
+	                        value="#{newspaperBean.orderBy}">
+				        <f:selectItem id="#{id}item1" itemLabel="Newspaper Id" itemValue="NewspaperID" />
+				        <f:selectItem id="#{id}item2" itemLabel="Newspaper name" itemValue="NewspaperName" />
+				        <f:ajax event="change" listener="#{newspaperBean.orderResults}" render="#{id}_resultsGrid"/>
+				    </h:selectOneMenu>
+				    
+			    </h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		<h:panelGrid columns="2" style="width:100%;">
+		<a4j:outputPanel id="#{id}_addGrid">
+		<c:set value="#{newspaperBean.declaration}" var="declaration"/>
+		<rich:panel id="#{id}_add" header="Add newspaper" > 
+			<h:panelGrid columns="2">
+
+				<h:outputText value="Newspaper Id" />
+				<h:inputText value="#{declaration.newspaperId}" /> 
+				
+				<h:outputText value="Newspaper name" />
+				<h:inputText value="#{declaration.newspaperName}" />
+
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Add newspaper" action="#{newspaperBean.insert}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{newspaperBean.clearAdd}" render="#{id}_addGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+
+		<a4j:outputPanel id="#{id}_updateGrid">
+		<rich:panel id="#{id}_update" header="Update newspaper"> 
+		<c:set value="#{newspaperBean.update}" var="update"/>
+			<h:panelGrid columns="2">
+				<h:outputText value="Update newspaper with id" style="font-weight: bold;"/>
+				<h:inputText value="#{newspaperBean.updateNewsId}" />
+			</h:panelGrid>
+			<h:panelGrid columns="2">
+			
+					<h:outputText value="Newspaper Id" />
+				<h:inputText value="#{update.newspaperId}" /> 
+				
+				<h:outputText value="Newspaper name" />
+				<h:inputText value="#{update.newspaperName}" />
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" >
+				<a4j:commandButton value="Update newspaper" action="#{newspaperBean.update}" render="@all"/>
+				<a4j:commandButton value="Clear" action="#{newspaperBean.clearUpdate}" render="#{id}_updateGrid"/>
+			</h:panelGrid>		
+		</rich:panel>
+		</a4j:outputPanel>
+		
+		</h:panelGrid>
+		<c:set value="#{newspaperBean.search}" var="search"/>
+		<rich:panel id="#{id}_search" header="Search for newspapers" style="text-align:center;"> 
+			<h:panelGrid columns="2" style="margin:auto;">
+			
+				<d:strOpField id="#{id}_newsId" label="Newspaper Id" 
+					value="#{search.newspaperId}" opValue="#{search.newspaperIdOp}"/>
+				
+				<d:strOpField id="newsname" label="Newspaper name" 
+					value="#{search.newspaperName}" opValue="#{search.newspaperNameOp}"/>
+			
+			</h:panelGrid>
+			
+			<h:panelGrid columns="2" style="margin:auto;" >
+				<a4j:commandButton value="Search" action="#{newspaperBean.search}" render="@all"/>
+				<a4j:commandButton value="Clear criteria" action="#{newspaperBean.clearSearch}" 
+					render="#{id}_searchResultsGrid #{id}_search"/>
+			</h:panelGrid>		
+			
+		<a4j:outputPanel id="#{id}_searchResultsGrid">
+		<rich:panel id="#{id}_search_results_panel" header="Search results" style="text-align:center;" > 
+			<h:outputText rendered="#{empty newspaperBean.searchResults}" 
+				value="No newspapers found with the provided criteria"/>
+				
+			<rich:panel rendered="#{not empty newspaperBean.searchResults}" style="text-align: center;">
+				<rich:dataScroller for="#{id}_search_table" rendered="#{newspaperBean.searchResults.size() &gt; 10}"/>
+				<rich:dataTable id="#{id}_search_table" value="#{newspaperBean.searchResults}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					
+					<rich:column id="#{id}_search_newsID" >
+						<f:facet name="header">Newspaper Id</f:facet>
+						<h:outputText value="#{result.newspaperId}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_search_news_name" >
+						<f:facet name="header">Newspaper name</f:facet>
+						<h:outputText value="#{result.newspaperName}" />
+					</rich:column>
+					
+					<rich:column id="#{id}_actions" >
+						<f:facet name="header">Actions</f:facet>
+						<a4j:commandLink value="Delete" action="#{newspaperBean.delete(result)}" render="@all"
+							onclick="if (! confirm('Are you sure you want to delete this entry?')) return false"/>
+						|
+						<a4j:commandLink value="Update" action="#{newspaperBean.prepareUpdate(result)}" render="#{id}_updateGrid"/>
+					</rich:column>
+				</rich:dataTable>
+				
+				<h:panelGrid columns="1" >
+					<a4j:commandButton rendered="#{newspaperBean.searchResults.size() &gt; 1}" value="Delete All" 
+						action="#{newspaperBean.deleteAll}" style="float:left" render="@all"
+						onclick="if (! confirm('Are you sure you want to delete these entries?')) return false"/>
+				</h:panelGrid>
+			</rich:panel>
+		</rich:panel>
+		</a4j:outputPanel>
+		</rich:panel>
+
+</ui:composition>
+</html>

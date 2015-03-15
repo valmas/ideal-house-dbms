@@ -204,4 +204,30 @@ public class CodelistController {
 		}
 		return list;
 	}
+	
+	public List<CodeListItem> getNewspapersIds(){
+		Connection connection = jdbc.getJdbcConnection();
+		Statement statement = null;
+		ResultSet resultSet = null;
+		List<CodeListItem> list = new ArrayList<CodeListItem>();
+		list.add(empty);
+		try{
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery(Queries.NEWS_IDS);
+			while (resultSet.next()) {
+				String value = resultSet.getString("NewspaperID");
+				String description = resultSet.getString("NewspaperName");
+				list.add(new CodeListItem(value, description, true));
+			}
+		} catch (SQLException e) {
+			FacesContext.getCurrentInstance().addMessage(null, 
+					new FacesMessage(FacesMessage.SEVERITY_FATAL,
+							"Error while executing: "+ Queries.NEWS_IDS +" " +e.getMessage(), null));
+		} finally {
+			jdbc.freeResultSet(resultSet);
+			jdbc.freeStatement(statement);
+			jdbc.closeConnection(connection);
+		}
+		return list;
+	}
 }

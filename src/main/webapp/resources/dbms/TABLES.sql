@@ -12,13 +12,12 @@ create table Employees (
 	SupervisorAFM CHAR(9),
 	PRIMARY KEY (AFM),
 	FOREIGN KEY (SupervisorAFM) REFERENCES Employees(AFM),
-	CONSTRAINT chk_Employees CHECK (Salary > 510.95)
 );
 
 create table Properties (
 	PropertyRegistrationNo INT AUTO_INCREMENT NOT NULL,
-	Addr_StreetName VARCHAR(35),
-	Addr_StreetNo VARCHAR(4),
+	Addr_StreetName VARCHAR(35) NOT NULL,
+	Addr_StreetNo VARCHAR(4) NOT NULL,
 	Addr_PostalCode CHAR(5) NOT NULL,
 	Size FLOAT(6,2) NOT NULL,
 	Floor TINYINT UNSIGNED,
@@ -30,7 +29,6 @@ create table Properties (
 	FOREIGN KEY (PropertyTypeId) REFERENCES PropertyTypes(PropertyTypeID),
 	FOREIGN KEY (OwnerAFM) REFERENCES Owners(AFM),
 	FOREIGN KEY (ManagerAFM) REFERENCES Employees(AFM),
-	CONSTRAINT chk_Properties CHECK (Rent > 0)
 );
 
 create table PropertyTypes (
@@ -140,6 +138,16 @@ create table StopAction (
 	reasonToStop VARCHAR(100) NOT NULL,
 	PRIMARY KEY (reasonToStop)
 );
+
+create view VW_P_OWNERS as 
+	select o.AFM, Addr_StreetName, Addr_StreetNo, Addr_PostalCode, FirstName, LastName 
+		from Owners o JOIN PrivateOwners p 
+			on o.afm = p.afm;
+
+create view VW_B_OWNERS as 
+	select o.AFM, Addr_StreetName, Addr_StreetNo, Addr_PostalCode, BusinessName, BusinessType, ContactFirstName, ContactLastName
+		from Owners o JOIN BusinessOwners b 
+			on o.afm = b.afm;
 
 INSERT INTO StopAction VALUES('The selected Property is rented for the selected period');
 

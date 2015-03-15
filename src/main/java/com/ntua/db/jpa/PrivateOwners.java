@@ -149,12 +149,12 @@ public class PrivateOwners extends Owners {
 	 * @return the string
 	 */
 	public String searchQuery(){
-		String query = "SELECT * FROM Owners o, PrivateOwners p where o.afm = p.afm and";
+		String query = "SELECT * FROM vw_p_owners where";
 		query = query + parentSearchQuery();
-		query = query + Utils.constructSearchQuery(firstNameOp, firstName, " p.FirstName");
-		query = query + Utils.constructSearchQuery(lastNameOp, lastName, " p.LastName");
+		query = query + Utils.constructSearchQuery(firstNameOp, firstName, " FirstName");
+		query = query + Utils.constructSearchQuery(lastNameOp, lastName, " LastName");
 		if(query.endsWith("WHERE"))
-			query = query.substring(0, query.length()-8);
+			query = query.substring(0, query.length()-6);
 		else
 			query = query.substring(0, query.length()-3);
 		return query;

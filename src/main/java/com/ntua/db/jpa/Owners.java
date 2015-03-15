@@ -235,10 +235,10 @@ public class Owners {
 	 * @return the string
 	 */
 	public String parentSearchQuery(){
-		String query = Utils.constructSearchQuery(getAfmOp(), getAfm(), " o.AFM");
-		query = query + Utils.constructSearchQuery(streetNameOp, streetName, " o.Addr_StreetName");
-		query = query + Utils.constructSearchQuery(streetNoOp, streetNo, " o.Addr_StreetNo");
-		query = query + Utils.constructSearchQuery(postalCodeOp, postalCode, " o.Addr_PostalCode");
+		String query = Utils.constructSearchQuery(afmOp, afm, " AFM");
+		query = query + Utils.constructSearchQuery(streetNameOp, streetName, " Addr_StreetName");
+		query = query + Utils.constructSearchQuery(streetNoOp, streetNo, " Addr_StreetNo");
+		query = query + Utils.constructSearchQuery(postalCodeOp, postalCode, " Addr_PostalCode");
 		return query;
 	}
 	

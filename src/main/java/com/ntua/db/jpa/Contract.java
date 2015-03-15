@@ -354,7 +354,7 @@ public class Contract {
 		String query = "SELECT * FROM Contracts WHERE";
 		query = query + (StringUtils.hasText(contractsNo) ? " ContractsNo"+ contractsNoOp+"" + contractsNo + " and" : "");
 		query = query + (rent != null ? " Rent"+ rentOp+"" + rent + " and" : "");
-		query = query + (StringUtils.hasText(paymentType) ? " PaymentType="+ paymentType + " and" : "");
+		query = query + (StringUtils.hasText(paymentType) ? " PaymentType='"+ paymentType + "' and" : "");
 		query = query + (rentStart != null ? " RentStart"+ rentStartOp+"'" + Utils.getSqlDate(rentStart) + "' and" : "");
 		query = query + (rentFinish != null ? " RentFinish"+ rentFinishOp+"'" + Utils.getSqlDate(rentFinish) + "' and" : "");
 		query = query + (StringUtils.hasText(clientRegNo) ? " ClientRegistrationNo"+ clientRegNoOp+"" + clientRegNo + " and" : "");

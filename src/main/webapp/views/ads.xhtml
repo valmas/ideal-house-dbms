@@ -16,33 +16,25 @@
           <li><h:commandLink action="#{homeBean.init}" value="Home"/></li>
           <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
           <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
-          <li class="selected"><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
+          <li><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
           <li><h:commandLink action="#{clientBean.init}" value="Clients"/></li>
-          <li><h:commandLink action="#{newspaperBean.init}" value="Advertisements"/></li>
+          <li class="selected"><h:commandLink action="#{newspaperBean.init}" value="Advertisements"/></li>
         </ul>
 	</ui:define>
 	<ui:define name="content">
 	
-	<rich:collapsiblePanel header="Business Owners" switchType="client" expanded="false">
+	<rich:collapsiblePanel header="Newspaper" switchType="client" expanded="false">
 	
-		<ui:include src="/views/businessOwners.xhtml">
-			<ui:param name="id" value="bOwner"/>
+		<ui:include src="/views/newspaper.xhtml">
+			<ui:param name="id" value="news"/>
 		</ui:include>
 		
 	</rich:collapsiblePanel>
 	
-	<rich:collapsiblePanel header="Private owners" switchType="client" expanded="false">
-		
-		<ui:include src="/views/privateOwners.xhtml">
-			<ui:param name="id" value="pOwner"/>
-		</ui:include>
-		
-	</rich:collapsiblePanel>
+	<rich:collapsiblePanel header="Advertisements" switchType="client" expanded="false">
 	
-	<rich:collapsiblePanel header="Owners' phones" switchType="client" expanded="false">
-		
-		<ui:include src="/views/ownersPhone.xhtml">
-			<ui:param name="id" value="ownerPhone"/>
+		<ui:include src="/views/adsInfo.xhtml">
+			<ui:param name="id" value="ad"/>
 		</ui:include>
 		
 	</rich:collapsiblePanel>
