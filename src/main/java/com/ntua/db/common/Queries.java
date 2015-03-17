@@ -24,9 +24,11 @@ public class Queries {
 	
 	public static final String NEWS_IDS = "Select * FROM Newspapers";
 	
+	public static final String ADS_STATS = "Select * FROM VW_ads_info";
+	
 	public static final String MOST_WANTED = "select Addr_StreetName ,Addr_StreetNo ,Addr_PostalCode,size,floor,p.rent,"
 			+ "description,rooms, Count(*) As contracts_num, IF(min(status) = 0, 'rented' ,'available') as status From Properties p, "
-			+ "PropertyTypes pt, (select PropertyRegistrationNo, IF(c.rentStart > '2015-3-14' or c.rentFinish < '2015-3-14', 1 ,0)"
+			+ "PropertyTypes pt, (select PropertyRegistrationNo, IF(c.rentStart > DATE(NOW()) or c.rentFinish < DATE(NOW()), 1 ,0)"
 			+ " as status from contracts c) As table1 where p.PropertyRegistrationNo = table1.PropertyRegistrationNo "
 			+ "and pt.PropertyTypeID = p.PropertyTypeID group by p.PropertyRegistrationNo order by contracts_num DESC;";
 

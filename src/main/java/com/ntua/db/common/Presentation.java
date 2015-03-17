@@ -43,6 +43,18 @@ public class Presentation {
 	/** The last name. */
 	private String lastName;
 	
+	/** The newspaper name. */
+	private String newspaperName;
+	
+	/** The total cost. */
+	private BigDecimal totalCost;
+	
+	/** The avg cost. */
+	private BigDecimal avgCost;
+	
+	/** The total duration. */
+	private Integer totalDuration;
+	
 	/**
 	 * Gets the contracts_num.
 	 *
@@ -258,5 +270,79 @@ public class Presentation {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
+	/**
+	 * Gets the newspaper name.
+	 *
+	 * @return the newspaper name
+	 */
+	public String getNewspaperName() {
+		return newspaperName;
+	}
+
+	/**
+	 * Sets the newspaper name.
+	 *
+	 * @param newspaperName the new newspaper name
+	 */
+	public void setNewspaperName(String newspaperName) {
+		this.newspaperName = newspaperName;
+	}
+
+	/**
+	 * Gets the total cost.
+	 *
+	 * @return the total cost
+	 */
+	public BigDecimal getTotalCost() {
+		return totalCost;
+	}
+
+	/**
+	 * Sets the total cost.
+	 *
+	 * @param totalCost the new total cost
+	 */
+	public void setTotalCost(BigDecimal totalCost) {
+		this.totalCost = totalCost;
+	}
+
+	/**
+	 * Gets the avg cost.
+	 *
+	 * @return the avg cost
+	 */
+	public BigDecimal getAvgCost() {
+		return avgCost;
+	}
+
+	/**
+	 * Sets the avg cost.
+	 *
+	 * @param avgCost the new avg cost
+	 */
+	public void setAvgCost(BigDecimal avgCost) {
+		this.avgCost = avgCost;
+	}
+
+	/**
+	 * Gets the total duration.
+	 *
+	 * @return the total duration
+	 */
+	public Integer getTotalDuration() {
+		return totalDuration;
+	}
+
+	/**
+	 * Sets the total duration.
+	 *
+	 * @param totalDuration the new total duration
+	 */
+	public void setTotalDuration(Integer totalDuration) {
+		this.totalDuration = totalDuration;
+	}
+	
+	
 	
 }

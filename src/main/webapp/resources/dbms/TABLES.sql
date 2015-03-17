@@ -148,6 +148,12 @@ create view VW_B_OWNERS as
 	select o.AFM, Addr_StreetName, Addr_StreetNo, Addr_PostalCode, BusinessName, BusinessType, ContactFirstName, ContactLastName
 		from Owners o JOIN BusinessOwners b 
 			on o.afm = b.afm;
+			
+create view VW_ads_info as 
+	select NewspaperName, IFNULL(sum(Cost), 0) as totalCost, IFNULL(avg(Cost), 0) as avgCost, IFNULL(sum(Duration), 0) as totalDuration 
+		from advertisements a right join Newspapers n 
+			on a.NewspaperID = n.NewspaperID 
+		group by n.NewspaperID
 
 INSERT INTO StopAction VALUES('The selected Property is rented for the selected period');
 

@@ -28,6 +28,8 @@ public class HomeBean {
 	
 	private List<Presentation> bestClients;
 	
+	private List<Presentation> adsStats;
+	
 	private BigDecimal highSal;
 	
 	private BigDecimal lowSal;
@@ -46,6 +48,7 @@ public class HomeBean {
 		selectMostWanted();
 		selectBestClients();
 		prepareEmpStats();
+		selectAdsStats();
 		jdbc.closeConnection(connection);
 		return "/index.xhtml?faces-redirect=true";
 	}
@@ -142,6 +145,35 @@ public class HomeBean {
 			jdbc.freeStatement(statement);
 		}
 	}
+	
+	public void selectAdsStats(){
+		Statement statement = null;
+		ResultSet resultSet = null;
+		try{
+			if (connection == null || connection.isClosed())
+				connection = jdbc.getJdbcConnection();
+			statement = connection.createStatement();
+			String queryString = Queries.ADS_STATS;
+			resultSet = statement.executeQuery(queryString);
+			adsStats = new ArrayList<Presentation>();
+			while (resultSet.next()) {
+				Presentation presentation = new Presentation();
+				presentation.setNewspaperName(resultSet.getString("NewspaperName"));
+				presentation.setTotalCost(resultSet.getBigDecimal("totalCost"));
+				presentation.setAvgCost(resultSet.getBigDecimal("avgCost").setScale(2, RoundingMode.CEILING));
+				presentation.setTotalDuration(resultSet.getInt("totalDuration"));
+				adsStats.add(presentation);
+			}
+			
+		} catch (SQLException e) {
+			FacesContext.getCurrentInstance().addMessage(null, 
+					new FacesMessage(FacesMessage.SEVERITY_FATAL,
+							"Error: " +e.getMessage(), null));
+		} finally {
+			jdbc.freeResultSet(resultSet);
+			jdbc.freeStatement(statement);
+		}
+	}
 
 	public List<Presentation> getMostWanted() {
 		return mostWanted;
@@ -182,5 +214,15 @@ public class HomeBean {
 	public void setAvgSal(BigDecimal avgSal) {
 		this.avgSal = avgSal;
 	}
+
+	public List<Presentation> getAdsStats() {
+		return adsStats;
+	}
+
+	public void setAdsStats(List<Presentation> adsStats) {
+		this.adsStats = adsStats;
+	}
+	
+	
 	
 }

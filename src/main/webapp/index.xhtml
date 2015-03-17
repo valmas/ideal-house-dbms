@@ -11,7 +11,7 @@
 	<ui:define name="menu">
 		<ul id="menu">
           <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
-          <li class="selected"><h:commandLink action="#{homeBean.init}" value="Clients"/></li>
+          <li class="selected"><h:commandLink action="#{homeBean.init}" value="Home"/></li>
           <li><h:commandLink action="#{employeeBean.init}" value="Employees"/></li>
           <li><h:commandLink action="#{propertyBean.init}" value="Properties"/></li>
           <li><h:commandLink action="#{bOwnersBean.init}" value="Owners"/></li>
@@ -116,6 +116,36 @@
 				<h:outputText value="#{homeBean.avgSal}" />
 				
 			</h:panelGrid>
+		</rich:panel>
+		
+		<rich:panel header="Advertisements statistics"> 
+			<h:panelGroup rendered="#{homeBean.adsStats != null }">
+				<rich:dataScroller for="adsStats_table" rendered="#{homeBean.adsStats.size() &gt; 10}"/>
+				<rich:dataTable id="adsStats_table" value="#{homeBean.adsStats}" 
+					var="result" rows="10" style="white-space:nowrap; width:100%;">
+					
+					<rich:column id="newspaperName" >
+						<f:facet name="header">Newspaper Name</f:facet>
+						<h:outputText value="#{result.newspaperName}" />
+					</rich:column>
+					
+					<rich:column id="totalCost">
+						<f:facet name="header">Total Cost</f:facet>
+						<h:outputText value="#{result.totalCost}" />
+					</rich:column>
+					
+					<rich:column id="avgCost">
+						<f:facet name="header">Average Cost</f:facet>
+						<h:outputText value="#{result.avgCost}" />
+					</rich:column>
+					
+					<rich:column id="totalDuration">
+						<f:facet name="header">Total Duration</f:facet>
+						<h:outputText value="#{result.totalDuration}" />
+					</rich:column>
+					
+				</rich:dataTable>
+			</h:panelGroup>
 		</rich:panel>
 	</ui:define>
 </ui:composition>
